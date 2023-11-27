@@ -19,6 +19,12 @@ class RandomForestMSE:
             The size of feature set for each tree. If None then use one-third of all features.
         """
 
+        self.n_estimators = n_estimators
+        self.max_depth = max_depth
+        self.fss = feature_subsample_size
+
+        self.tree_parameters = trees_parameters
+
     def fit(self, X, y, X_val=None, y_val=None):
         """
         X : numpy ndarray
