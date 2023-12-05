@@ -1,12 +1,15 @@
 import numpy as np
+from numpy import ndarray
 from scipy.optimize import minimize_scalar
+# from sklearn._typing import ArrayLike, MatrixLike
 from sklearn.tree import DecisionTreeRegressor
+from functools import reduce
 
 
 class RandomForestMSE:
     def __init__(
         self, n_estimators, max_depth=None, feature_subsample_size=None,
-        **trees_parameters
+        random_state=42, **trees_parameters
     ):
         """
         n_estimators : int
@@ -17,15 +20,26 @@ class RandomForestMSE:
 
         feature_subsample_size : float
             The size of feature set for each tree. If None then use one-third of all features.
+
+        random_state : int
+            set the random state for estimators. 42 by default
         """
+
+        self.trees = []
 
         self.n_estimators = n_estimators
         self.max_depth = max_depth
-        self.fss = feature_subsample_size
+        self.random_state = random_state
+
+        if isinstance(feature_subsample_size, float) and \
+                (feature_subsample_size > 1.0 or feature_subsample_size < 0.0):
+            raise ValueError(
+                'feature_subsample_size must be in range [0,1] or be integer')
+        self.fss = feature_subsample_size if not None else 1/3
 
         self.tree_parameters = trees_parameters
 
-    def fit(self, X, y, X_val=None, y_val=None):
+    def fit(self, X: np.ndarray, y, X_val=None, y_val=None):
         """
         X : numpy ndarray
             Array of size n_objects, n_features
@@ -40,6 +54,26 @@ class RandomForestMSE:
             Array of size n_val_objects
         """
 
+        if (isinstance(self.fss, int) and self.fss > X.shape[1]):
+            raise ValueError(
+                'X have less features than expected by feature_subsample_size')
+
+        for _ in range(self.n_estimators):
+            indexes = np.permutation(X.shape[0])
+
+            tree = DecisionTreeRegressor(
+                criterion='squared_error',
+                splitter='random',
+                max_depth=self.max_depth,
+                max_features=self.fss,
+                random_state=self.random_state,
+                **self.tree_parameters
+            )
+            tree.fit(X[indexes], y[indexes])
+            self.trees.append(tree)
+
+        return self
+
     def predict(self, X):
         """
         X : numpy ndarray
@@ -50,6 +84,9 @@ class RandomForestMSE:
         y : numpy ndarray
             Array of size n_objects
         """
+
+        preds = [tree.predict(X) for tree in self.trees]
+        return np.mean(np.array(preds), axis=1)
 
 
 class GradientBoostingMSE:
