@@ -1,7 +1,5 @@
 import numpy as np
-from numpy import ndarray
 from scipy.optimize import minimize_scalar
-# from sklearn._typing import ArrayLike, MatrixLike
 from sklearn.tree import DecisionTreeRegressor
 
 
@@ -153,7 +151,8 @@ class GradientBoostingMSE:
                 splitter='best',
                 max_features=fss,
                 random_state=self.random_state,
-                max_depth=self.max_depth
+                max_depth=self.max_depth,
+                **self.trees_parameters
             )
             tree.fit(X, grad)
             self.trees.append(tree)
