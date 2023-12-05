@@ -88,7 +88,7 @@ class RandomForestMSE:
         if self.trees is None:
             raise ValueError('model is not fited')
 
-        preds = [tree.predict(X) for tree in self.trees]
+        preds = [tree.predict(X).reshape((-1, 1)) for tree in self.trees]
         return np.mean(np.array(preds), axis=1)
 
 
@@ -173,5 +173,5 @@ class GradientBoostingMSE:
         if self.trees is None:
             raise ValueError('model is not fited')
 
-        preds = [tree.predict(X) for tree in self.trees]
+        preds = [tree.predict(X).reshape((-1, 1)) for tree in self.trees]
         return np.sum(np.array(preds), axis=1)
