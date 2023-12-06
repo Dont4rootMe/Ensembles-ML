@@ -4,6 +4,8 @@ from scipy.optimize import minimize_scalar
 from sklearn.tree import DecisionTreeRegressor
 from pandas import DataFrame, Series
 
+# suppress warnings outcoming from sklearn models
+
 
 def warn(*args, **kwargs):
     pass
@@ -44,6 +46,7 @@ class RandomForestMSE:
         self.random_state = random_state
         self.bootstrap = bootstrap
 
+        # check if feature_subsample_size is in valid range of values
         if isinstance(feature_subsample_size, float) and \
                 (feature_subsample_size > 1.0 or feature_subsample_size < 0.0):
             raise ValueError(
@@ -66,19 +69,23 @@ class RandomForestMSE:
         y_val : numpy ndarray
             Array of size n_val_objects
         """
+        self.trees = []
 
+        # if X or y are not numpy datastructures than redefine them
         if isinstance(X, DataFrame):
             X = X.to_numpy()
         if isinstance(y, Series):
             y = y.to_numpy()
 
-        self.trees = []
+        # generator, used in trees random_state
         rnd_gen = np.random.Generator(np.random.PCG64(self.random_state))
 
+        # check if predefined fss is less than count of features in objects
         if (isinstance(self.fss, int) and self.fss > X.shape[1]):
             raise ValueError(
                 'X have less features than expected by feature_subsample_size')
 
+        # if bootstrapping is enabled check and prepare splitting point
         bootstrap = None
         if self.bootstrap is not None:
             if (isinstance(self.bootstrap, int) and self.bootstrap > X.shape[0] or
@@ -92,6 +99,7 @@ class RandomForestMSE:
             idx = np.random.permutation(
                 X.shape[0])[:bootstrap] if bootstrap is not None else np.arange(X.shape[0])
 
+            # define tree structure
             tree = DecisionTreeRegressor(
                 criterion='squared_error',
                 splitter=self.splitter,
@@ -115,6 +123,7 @@ class RandomForestMSE:
         y : numpy ndarray
             Array of size n_objects
         """
+        # if model is not fitted yet raise error
         if self.trees is None:
             raise ValueError('model is not fited')
         preds = np.array([tree.predict(X) for tree in self.trees])
@@ -146,7 +155,7 @@ class GradientBoostingMSE:
         splitter: ['best', 'random']
             Criterion for splitting nodes in in trees
 
-        
+
         splitter: ['best', 'random']
             Criterion for splitting nodes in in trees
 
@@ -165,6 +174,7 @@ class GradientBoostingMSE:
         self.splitter = splitter
         self.bootstrap = bootstrap
 
+        # check if feature_subsample_size is in valid range of values
         if isinstance(feature_subsample_size, float) and \
                 (feature_subsample_size > 1.0 or feature_subsample_size < 0.0):
             raise ValueError(
@@ -182,18 +192,21 @@ class GradientBoostingMSE:
         """
         self.trees = []
 
+        # if X or y are not numpy datastructures than redefine them
         if isinstance(X, DataFrame):
             X = X.to_numpy()
         if isinstance(y, Series):
             y = y.to_numpy()
 
+        # generator, used in trees random_state
+        rnd_gen = np.random.Generator(np.random.PCG64(self.random_state))
+
+        # check if predefined fss is less than count of features in objects
         if (isinstance(self.fss, int) and self.fss > X.shape[1]):
             raise ValueError(
                 'X have less features than expected by feature_subsample_size')
 
-        fss = self.fss if isinstance(
-            self.fss, int) else round(X.shape[1] * self.fss)
-
+        # if bootstrapping is enabled check and prepare splitting point
         bootstrap = None
         if self.bootstrap is not None:
             if (isinstance(self.bootstrap, int) and self.bootstrap > X.shape[0] or
@@ -203,6 +216,7 @@ class GradientBoostingMSE:
                 bootstrap = self.bootstrap if isinstance(
                     self.bootstrap, int) else round(self.bootstrap * X.shape[0])
 
+        # initialize first target for boosting
         grad = y
 
         for _ in range(self.n_estimators):
@@ -212,14 +226,15 @@ class GradientBoostingMSE:
             tree = DecisionTreeRegressor(
                 criterion='squared_error',
                 splitter=self.splitter,
-                max_features=fss,
-                random_state=self.random_state,
+                max_features=self.fss,
+                random_state=rnd_gen.integers(0, 100_000_000),
                 max_depth=self.max_depth,
                 **self.trees_parameters
             )
             tree.fit(X[idx], grad[idx])
             self.trees.append(tree)
 
+            # gradient step
             grad = self.lr * (y - self.predict(X))
 
     def predict(self, X):
@@ -232,6 +247,7 @@ class GradientBoostingMSE:
         y : numpy ndarray
             Array of size n_objects
         """
+        # if model is not fitted yet raise error
         if self.trees is None:
             raise ValueError('model is not fited')
 
