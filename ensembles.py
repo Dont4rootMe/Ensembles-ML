@@ -142,6 +142,11 @@ class GradientBoostingMSE:
         feature_subsample_size : float | None
             The size of feature set for each tree. If None then use one-third of all features.
 
+
+        splitter: ['best', 'random']
+            Criterion for splitting nodes in in trees
+
+        
         splitter: ['best', 'random']
             Criterion for splitting nodes in in trees
 
