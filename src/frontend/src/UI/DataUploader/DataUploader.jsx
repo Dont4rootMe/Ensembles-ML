@@ -1,29 +1,55 @@
 import React, {useState, useEffect} from "react";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, InputGroup, Dropdown, DropdownButton } from "react-bootstrap";
 import RangeSlider from "react-bootstrap-range-slider";
 
 
 
 const DataUploader = ({config}) => {
-    const [dataSet, setDataSet] = useState(undefined);
-    const [validationSet, setValidationSet] = useState(undefined);
     const [internal_config, ] = useState({
         autoValid: true,
         validSize: 30, 
         targetIndex: undefined
     })
+
+    const [dataSet, setDataSet] = useState(undefined);
+    const [validationSet, setValidationSet] = useState(undefined);
+    const [targetIndex, setTargetIndex] = useState(undefined)
+
+
+    const [targetList, setTargetList] = useState([])
+    const [autoValid, setAutovalid] = useState(true)
+    const [validSize, setValidSize] = useState(30)
+
+    useEffect(() => {
+        internal_config.targetIndex = targetIndex
+    }, [targetIndex])
+
+    useEffect(() => {
+        internal_config.autoValid = autoValid
+        internal_config.validSize = validSize
+    }, [autoValid, validSize])
+
     
+    const _get_target_list = (delimiter) => {
+        if (!dataSet) {return;}
 
-    const _Validation_Type = ({}) => {
-        const [autoValid, setAutovalid] = useState(true)
-        const [validSize, setValidSize] = useState(30)
+        var reader = new FileReader();
+        reader.onload = function() {
+            const text = this.result;
 
-        useEffect(() => {
-            internal_config.autoValid = autoValid
-            internal_config.validSize = validSize
-        }, [autoValid, validSize])
-
-        return (
+            var line = text.split('\n')[0];
+            setTargetList(line.split(delimiter));
+        };
+        reader.readAsText(dataSet);
+    }
+    
+    return (
+        <>
+            <Form.Group controlId="formFile" size="sm" style={{marginBottom: '5px'}}>
+                <Form.Label style={{marginBottom: '0px'}}>Выберете датасет для обучения</Form.Label>
+                <Form.Control type="file" onChange={(e) => setDataSet(e.target.files[0])} />
+            </Form.Group>
+            
             <>
                 <Form.Check
                     style={{fontSize: '0.8em'}}
@@ -49,33 +75,30 @@ const DataUploader = ({config}) => {
                     <Form.Control type="file" onChange={(e) => setValidationSet(e.target.files[0])} />
                 </Form.Group>}
             </>
-        )
-    }
 
-    const _Target_define = ({}) => {
-        const [targetIndex, setTargetIndex] = useState(undefined)
+            <Form>
+                <Form.Text>Выберите поле target</Form.Text>
+                <InputGroup className="mb-3">
+                    <DropdownButton
+                    variant="outline-secondary"
+                    title="del."
+                    id="input-group-dropdown-1"
+                    >
+                        <Dropdown.Item onClick={() => _get_target_list(',')}>delimiter:   ","</Dropdown.Item>
+                        <Dropdown.Item onClick={() => _get_target_list(';')}>delimiter:   ";"</Dropdown.Item>
+                        <Dropdown.Item onClick={() => _get_target_list('\t')}>delimiter:   "\t"</Dropdown.Item>
 
-        useEffect(() => {
-            internal_config.targetIndex = targetIndex
-        }, [targetIndex])
-
-        return (
-            <Form.Group>
-                <Form.Text >Имя колонки таргета или его индекс</Form.Text>
-                <Form.Control size="sm" type="text" placeholder="target" value={targetIndex} onChange={e => setTargetIndex(e.target.value)}/>
-            </Form.Group>
-        )
-    } 
-
-    return (
-        <>
-            <Form.Group controlId="formFile" size="sm" style={{marginBottom: '5px'}}>
-                <Form.Label style={{marginBottom: '0px'}}>Выберете датасет для обучения</Form.Label>
-                <Form.Control type="file" onChange={(e) => setDataSet(e.target.files[0])} />
-            </Form.Group>
-            <_Validation_Type />
-
-            <_Target_define />
+                    </DropdownButton>
+                    <Form.Select aria-label="Text input with dropdown button" 
+                        onChange={(e) => setTargetIndex(e.target.value)}
+                    >
+                        {targetList.map(item => 
+                            <option key={item} value={item}>
+                                {item}
+                            </option>)}
+                    </Form.Select>
+                </InputGroup>
+            </Form>
 
             <Button variant='success' 
                     style={{marginTop: '10px'}}

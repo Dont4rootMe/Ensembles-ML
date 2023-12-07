@@ -11,6 +11,8 @@ pandas = "*"
 uvicorn = "*"
 fastapi = "*"
 python-dotenv = "*"
+pydentic = "*"
+pydantic = "*"
 
 [dev-packages]
 ipykernel = "*"
