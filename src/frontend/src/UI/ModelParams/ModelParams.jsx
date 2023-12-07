@@ -157,7 +157,7 @@ const ModelParams = ({ modelType, config }) => {
     return (
         <div style={{marginTop: '3%', display: 'flex', flexDirection: 'column',
                      border: '1px solid rgb(0,0,0, 0.1)', borderRadius: '5px', padding: '5px'}}>
-            <span style={{fontSize: '1.2em', marginBottom: '10px'}}><bold>Гиперпараметры модели:</bold></span>
+            <span style={{fontSize: '1.2em', marginBottom: '10px'}}><strong>Гиперпараметры модели:</strong></span>
             <_Settings type={modelType}/>
 
         </div>

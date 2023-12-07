@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Form, FloatingLabel } from 'react-bootstrap'
 import ModelParams from './UI/ModelParams/ModelParams'
+import DataSetDefiner from './DataSetDefiner'
 
 const ModelSettings = ({ }) => {
 
@@ -27,7 +28,7 @@ const ModelSettings = ({ }) => {
                 </Form.Control>
             </FloatingLabel>
             <ModelParams modelType={config['model']} config={config} />
-
+            <DataSetDefiner config={config}/>
         </div>
     )
 }
