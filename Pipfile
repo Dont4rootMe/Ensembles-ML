@@ -8,6 +8,8 @@ numpy = "*"
 scipy = "*"
 scikit-learn = "*"
 pandas = "*"
+uvicorn = "*"
+fastapi = "*"
 
 [dev-packages]
 ipykernel = "*"
