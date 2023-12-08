@@ -102,6 +102,7 @@ const DataUploader = ({config}) => {
 
             <Button variant='success' 
                     style={{marginTop: '10px'}}
+                    onClick={() => console.log(config)}
             >Обучить модель!</Button>
         </>
     )

@@ -1,10 +1,21 @@
-import React, {useState} from "react";
-import { Form, Button } from "react-bootstrap";
+import React, {useState, useEffect} from "react";
+import { Form, Button, Dropdown } from "react-bootstrap";
 import RangeSlider from 'react-bootstrap-range-slider';
+import { call_post, call_get } from "../../CALLBACKS";
 
 const SynteticDataGenerator = ({config}) => {
     const [sampleSize, setSampleSize] = useState(30000)
     const [featureSize, setFeatureSize] = useState(15)
+    const [validationSplitter, setValidationSplitter] = useState('30')
+
+    useEffect(() => {
+        if (!config) {return;}
+        config.synt_prefs = {
+            sample_size: sampleSize,
+            feature_size: featureSize,
+            validation_percent: validationSplitter
+        }
+    }, [config, sampleSize, featureSize, validationSplitter])
 
     return (
         <>
@@ -29,9 +40,32 @@ const SynteticDataGenerator = ({config}) => {
                 />
             </Form.Group>
 
-            <Button variant='success' 
-                    style={{marginTop: '10px'}}
-            >Обучить модель!</Button>
+            <Form.Group size="sm">
+                <Form.Text size="mm">{`Доля на тест: ${validationSplitter}%`}</Form.Text>
+                <RangeSlider 
+                    max={50}
+                    min={10}
+                    variant='primary'
+                    value={validationSplitter}
+                    tooltipLabel={currentValue => `${validationSplitter}%`}
+                    onChange={e => setValidationSplitter(e.target.value)}
+                />
+            </Form.Group>
+
+            <Dropdown >
+                <Dropdown.Toggle variant="success" style={{marginTop: '10px'}}>
+                    Обучить модель!
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+                    <Dropdown.Item href="#/action-historic-on" 
+                        onClick={() => call_post('http://localhost:8000/syntet-train', config, {history: true})}
+                    >Показать историю</Dropdown.Item>
+                    <Dropdown.Item href="#/action-historic-off"
+                        onClick={() => call_post('http://localhost:8000/syntet-train', config, {history: false})}
+                    >Без истории</Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
         </>
     )
 }

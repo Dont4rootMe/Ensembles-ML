@@ -45,12 +45,12 @@ const ModelParams = ({ modelType, config }) => {
         useEffect(() => {
             if (config) {
                 config.estimators = estimators
-                config.depth = useMaxDepth ? depth : undefined
+                config.depth = useMaxDepth ? depth : null
                 config.fetSubsample = fetSubsample === '' ? 1/3 : fetSubsample
                 config.useRandomSplit = useRandomSplit
-                config.bootstrapCoef = useBootstraping ? bootstrapCoef : undefined
-                config.randomState = randomState === '' ? undefined : randomState
-                config.learningRate = type==='grad-boosting' ? learningRate : undefined
+                config.bootstrapCoef = useBootstraping ? bootstrapCoef : null
+                config.randomState = randomState === '' ? null : randomState
+                config.learningRate = type==='grad-boosting' ? learningRate : null
             }
             console.log(config)
         }, [config, estimators, depth, useMaxDepth, fetSubsample, useRandomSplit, bootstrapCoef, useBootstraping, randomState, learningRate])
