@@ -39,3 +39,30 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
         'history': history if trace else None
     }
     return response
+
+
+def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, trace: bool):
+    model: ensembles.GradientBoostingMSE = ensembles.GradientBoostingMSE(
+        n_estimators=config.estimators,
+        learning_rate=config.learningRate,
+        max_depth=config.depth,
+        feature_subsample_size=config.fetSubsample,
+        splitter='best' if not config.useRandomSplit else 'random',
+        bootstrap=config.bootstrapCoef,
+    )
+    history_obj = {
+        'X_val': X_test,
+        'y_val': y_test
+    } if trace else {}
+
+    history = model.fit(X_train, y_train, **history_obj)
+    mse, r2, mape  = model.make_metrics(X_test, y_test)
+
+    response = {
+        'model': 'Random forest',
+        'mse': mse,
+        'r2': r2,
+        'mape': mape,
+        'history': history if trace else None
+    }
+    return response

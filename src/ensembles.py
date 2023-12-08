@@ -239,6 +239,14 @@ class GradientBoostingMSE:
             else:
                 bootstrap = self.bootstrap if isinstance(
                     self.bootstrap, int) else round(self.bootstrap * X.shape[0])
+                
+        history = None      
+        if X_val is not None and y_val is not None:
+            history = {
+                'mse': [],
+                'r2': [],
+                'mape': []
+            }
 
         # initialize first target for boosting
         grad = y
@@ -260,6 +268,23 @@ class GradientBoostingMSE:
 
             # gradient step
             grad = self.lr * (y - self.predict(X))
+
+            if history is not None:
+                mse, r2, mape = self.make_metrics(X_val, y_val)
+                history['mse'].append(mse)
+                history['r2'].append(r2)
+                history['mape'].append(mape)
+
+        return self if history is None else history
+
+    def make_metrics(self, X, y):
+        preds = self.predict(X)
+
+        mse = mean_squared_error(y, preds)
+        r2 = r2_score(y, preds)
+        mape = mean_absolute_percentage_error(y, preds)
+
+        return mse, r2, mape
 
     def predict(self, X):
         """

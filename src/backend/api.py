@@ -29,6 +29,8 @@ def train_on_syntetic_dataset(config: schemes.ConfigurationSyntet, trace: bool):
                                                                     config.synt_prefs.validation_percent)
     if config.model == 'random-forest':
         return engine.train_random_forest(X_train, X_test, y_train, y_test, config, trace)
+    if config.model == 'grad-boosting':
+        return engine.train_grad_boost(X_train, X_test, y_train, y_test, config, trace)
 
 if __name__ == '__main__':
     uvicorn.run('api:app', host='0.0.0.0')

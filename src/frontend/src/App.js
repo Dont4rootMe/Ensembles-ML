@@ -23,7 +23,7 @@ function App() {
     let temp = []
     for (const hist of modelHistoryLine) {
       if (hist.key !== key) {
-        temp.append(hist)
+        temp.push(hist)
       }
     }
 

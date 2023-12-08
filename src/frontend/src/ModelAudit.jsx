@@ -7,7 +7,8 @@ const ModelAudit = ({modelHistoryLine, deleteHistory}) => {
     return (
         <div style={{display: 'flex', flexDirection: 'column', paddingLeft: '20px'}}>
             <h1 style={{ fontSize: '2.3em', alignSelf: 'self-end', paddingRight: '3em'}}>История моделей</h1>
-            <div style={{display: 'flex', flexDirection: 'column'}}>
+            <div style={{display: 'flex', flexDirection: 'column',
+                         position: 'absolute', overflowY: 'auto', height: '79%', top: '9%'}}>
                 {
                     modelHistoryLine && modelHistoryLine.map(plate => <ModelHistory plate={plate} deleteHistory={deleteHistory}/>)
                 }

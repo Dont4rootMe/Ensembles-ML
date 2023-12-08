@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import { Card, Button, Badge, CloseButton } from 'react-bootstrap';
+import SmartPlot from '../SmartPlot/SmartPlot';
 
 const ModelHistory = ({plate, deleteHistory}) => {
     console.log(plate)
@@ -16,6 +17,9 @@ const ModelHistory = ({plate, deleteHistory}) => {
                 </div>
                 <CloseButton onClick={() => deleteHistory(plate.key)}/>
             </Card.Header>
+
+            {plate.history.trace && <SmartPlot data={plate.history.history}/>}
+
             <Card.Body>
                 <Card.Title style={{marginBottom: '0px'}}>Данные модели</Card.Title>
                 <div style={{width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr',
@@ -56,7 +60,6 @@ const ModelHistory = ({plate, deleteHistory}) => {
                 <Card.Text style={{marginBottom: '0px', marginLeft: '1em'}}>
                     {plate.history.r2 && (`R^2: ${getFloatPrecision(plate.history.r2)}`)}
                 </Card.Text>
-                <Button variant="primary">Go somewhere</Button>
             </Card.Body>
         </Card>
     )
