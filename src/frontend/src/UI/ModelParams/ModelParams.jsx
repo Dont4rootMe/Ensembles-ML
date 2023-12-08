@@ -26,7 +26,7 @@ const ModelParams = ({ modelType, config }) => {
 
 
     const _Settings = ({type}) => {
-        const [estimators, setEstimators] = useState('100')
+        const [estimators, setEstimators] = useState('10')
 
         const [depth, setDepth] = useState('100')
         const [useMaxDepth, setUseMaxDepth] = useState(false)
@@ -52,7 +52,6 @@ const ModelParams = ({ modelType, config }) => {
                 config.randomState = randomState === '' ? null : randomState
                 config.learningRate = type==='grad-boosting' ? learningRate : null
             }
-            console.log(config)
         }, [config, estimators, depth, useMaxDepth, fetSubsample, useRandomSplit, bootstrapCoef, useBootstraping, randomState, learningRate])
 
         return (

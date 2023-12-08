@@ -12,6 +12,8 @@ function App() {
   const [historyOffTop, setHistoryOffTop] = useState(0)
   const [modelHistoryLine, setModelHistoryLine] = useState([])
 
+  // useEffect(() => {console.log('spotted!!')}, [modelHistoryLine])
+
   const addHistory = (history) => {
     setModelHistoryLine([...modelHistoryLine, {'key': historyOffTop, 'history': history}])
     setHistoryOffTop(historyOffTop + 1)
@@ -30,11 +32,11 @@ function App() {
 
 
   return (
-    <div style={{ height: '100%', width: '100%', paddingTop: '3%', paddingLeft: '7%', paddingRight: '7%' }}>
+    <div style={{ height: '100%', width: '100%', paddingTop: '3%', paddingLeft: '7%', paddingRight: '7%', columnGap: '10px'}}>
       <ToastList />
       <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '3fr 7fr' }}>
         <ModelSettings addHistory={addHistory}/>
-        <ModelAudit deleteHistory={deleteHistory}/>
+        <ModelAudit modelHistoryLine={modelHistoryLine} deleteHistory={deleteHistory}/>
       </div>
     </div>
   );

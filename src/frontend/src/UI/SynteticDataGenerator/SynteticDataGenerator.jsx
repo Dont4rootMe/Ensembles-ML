@@ -19,7 +19,14 @@ const SynteticDataGenerator = ({config, addHistory}) => {
 
 
     const trainModel = async (trace) => {
-        let history = {dataset: 'synt', trace: trace}
+        let history = {dataset: 'synt',
+                       trace: trace, 
+                       sample_size: sampleSize, 
+                       feature_size: featureSize, 
+                       validation_percent: validationSplitter,
+                       config: config
+        }
+
         const reply = await call_post('http://localhost:8000/syntet-train', config, {trace: trace})
         if (reply instanceof BadResponse) {
             console.log(reply)

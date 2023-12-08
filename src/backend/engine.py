@@ -32,6 +32,7 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
     mse, r2, mape  = model.make_metrics(X_test, y_test)
 
     response = {
+        'model': 'Random forest',
         'mse': mse,
         'r2': r2,
         'mape': mape,

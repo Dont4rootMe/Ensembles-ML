@@ -1,14 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Any
 
-
-class ModelStats(BaseModel):
-    RMSE: float
-    R2_score: float
-    smape: float
-    mape: float
-
-
 class ModelTrainResponse(BaseModel):
     class _ModelHistory(BaseModel):
         mse: List[float]
@@ -16,7 +8,10 @@ class ModelTrainResponse(BaseModel):
         mape: List[float]
 
     history: _ModelHistory | None
-    stats: ModelStats
+    model: str
+    mse: float
+    r2: float
+    mape: float
 
 
 class Configuration(BaseModel):

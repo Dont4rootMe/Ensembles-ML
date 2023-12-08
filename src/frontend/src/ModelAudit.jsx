@@ -3,14 +3,13 @@ import ModelHistory from "./UI/ModelHistory/ModelHistory";
 
 
 
-const ModelAudit = ({history}) => {
-
+const ModelAudit = ({modelHistoryLine, deleteHistory}) => {
     return (
-        <div style={{display: 'flex', flexDirection: 'column'}}>
+        <div style={{display: 'flex', flexDirection: 'column', paddingLeft: '20px'}}>
             <h1 style={{ fontSize: '2.3em', alignSelf: 'self-end', paddingRight: '3em'}}>История моделей</h1>
             <div style={{display: 'flex', flexDirection: 'column'}}>
                 {
-                    history.map(history => <ModelHistory history={history} />)
+                    modelHistoryLine && modelHistoryLine.map(plate => <ModelHistory plate={plate} deleteHistory={deleteHistory}/>)
                 }
             </div>
         </div>

@@ -2,7 +2,7 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from settings import BACKEND_URL
-from typing import Dict
+from fastapi.responses import JSONResponse
 
 import schemes
 import engine
@@ -22,7 +22,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post('/syntet-train')   #, response_model=schemes.ModelTrainResponse)
+@app.post('/syntet-train', response_model=schemes.ModelTrainResponse)
 def train_on_syntetic_dataset(config: schemes.ConfigurationSyntet, trace: bool):
     X_train, X_test, y_train, y_test = engine.make_syntetic_dataset(config.synt_prefs.sample_size, 
                                                                     config.synt_prefs.feature_size,

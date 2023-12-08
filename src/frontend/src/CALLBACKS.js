@@ -1,18 +1,15 @@
 import axios from "axios";
 
-export class BadResponse {
-    _validateResponse() {
-        if (this.status == 403) {
-            call_get(`${process.env.REACT_APP_BACKEND ?? 'http://localhost:8000'}/users/pullRole`).then((response) => {
-                if (response instanceof Error) { console.log(response); return; }
-                localStorage.setItem('role', response.data)
-            })
-        }
+export class Response {
+    constructor(response) {
+        this.data = response.data
     }
+}
 
+export class BadResponse {
     constructor(response) {
         this.status = response.response.status
-        this.detail = response.response.data.detail
+        this.detail = response.response.data && response.response.data.detail
         this.message = response.message
     }
 }
