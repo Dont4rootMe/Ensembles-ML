@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from "react";
 import { Form, Button, Dropdown } from "react-bootstrap";
 import RangeSlider from 'react-bootstrap-range-slider';
-import { call_post, call_get } from "../../CALLBACKS";
+import { call_post, BadResponse } from "../../CALLBACKS";
 
-const SynteticDataGenerator = ({config}) => {
+const SynteticDataGenerator = ({config, addHistory}) => {
     const [sampleSize, setSampleSize] = useState(30000)
     const [featureSize, setFeatureSize] = useState(15)
     const [validationSplitter, setValidationSplitter] = useState('30')
@@ -16,6 +16,17 @@ const SynteticDataGenerator = ({config}) => {
             validation_percent: validationSplitter
         }
     }, [config, sampleSize, featureSize, validationSplitter])
+
+
+    const trainModel = async (trace) => {
+        let history = {dataset: 'synt', trace: trace}
+        const reply = await call_post('http://localhost:8000/syntet-train', config, {trace: trace})
+        if (reply instanceof BadResponse) {
+            console.log(reply)
+        } else {
+            addHistory({...history, ...reply.data})
+        }
+    }
 
     return (
         <>
@@ -59,10 +70,10 @@ const SynteticDataGenerator = ({config}) => {
 
                 <Dropdown.Menu>
                     <Dropdown.Item href="#/action-historic-on" 
-                        onClick={() => call_post('http://localhost:8000/syntet-train', config, {history: true})}
+                        onClick={() => trainModel(true)}
                     >Показать историю</Dropdown.Item>
                     <Dropdown.Item href="#/action-historic-off"
-                        onClick={() => call_post('http://localhost:8000/syntet-train', config, {history: false})}
+                        onClick={() => trainModel(false)}
                     >Без истории</Dropdown.Item>
                 </Dropdown.Menu>
             </Dropdown>

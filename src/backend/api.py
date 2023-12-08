@@ -22,13 +22,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post('/syntet-train')
-def train_on_syntetic_dataset(config: schemes.ConfigurationSyntet, history: bool):
+@app.post('/syntet-train')   #, response_model=schemes.ModelTrainResponse)
+def train_on_syntetic_dataset(config: schemes.ConfigurationSyntet, trace: bool):
     X_train, X_test, y_train, y_test = engine.make_syntetic_dataset(config.synt_prefs.sample_size, 
                                                                     config.synt_prefs.feature_size,
                                                                     config.synt_prefs.validation_percent)
     if config.model == 'random-forest':
-        engine.train_random_forest(X_train, X_test, y_train, y_test, config, history)
+        return engine.train_random_forest(X_train, X_test, y_train, y_test, config, trace)
 
 if __name__ == '__main__':
     uvicorn.run('api:app', host='0.0.0.0')

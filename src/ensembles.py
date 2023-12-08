@@ -3,6 +3,7 @@ import numpy as np
 from scipy.optimize import minimize_scalar
 from sklearn.tree import DecisionTreeRegressor
 from pandas import DataFrame, Series
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_percentage_error
 
 # suppress warnings outcoming from sklearn models
 
@@ -95,6 +96,14 @@ class RandomForestMSE:
                 bootstrap = self.bootstrap if isinstance(
                     self.bootstrap, int) else round(self.bootstrap * X.shape[0])
 
+        history = None      
+        if X_val is not None and y_val is not None:
+            history = {
+                'mse': [],
+                'r2': [],
+                'mape': []
+            }
+
         for _ in range(self.n_estimators):
             idx = np.random.permutation(
                 X.shape[0])[:bootstrap] if bootstrap is not None else np.arange(X.shape[0])
@@ -111,7 +120,22 @@ class RandomForestMSE:
             tree.fit(X[idx], y[idx])
             self.trees.append(tree)
 
-        return self
+            if history is not None:
+                mse, r2, mape = self.make_metrics(X_val, y_val)
+                history['mse'].append(mse)
+                history['r2'].append(r2)
+                history['mape'].append(mape)
+
+        return self if history is None else history
+    
+    def make_metrics(self, X, y):
+        preds = self.predict(X)
+
+        mse = mean_squared_error(y, preds)
+        r2 = r2_score(y, preds)
+        mape = mean_absolute_percentage_error(y, preds)
+
+        return mse, r2, mape
 
     def predict(self, X):
         """

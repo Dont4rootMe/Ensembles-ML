@@ -15,9 +15,7 @@ def make_syntetic_dataset(sample_size: int, feature_size: int, percent: int) -> 
 
     return train_test_split(X, y, test_size=(percent / 100))
 
-def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration, history: bool):
-    print(config)
-
+def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration, trace: bool):
     model: ensembles.RandomForestMSE = ensembles.RandomForestMSE(
         n_estimators=config.estimators,
         max_depth=config.depth,
@@ -28,8 +26,15 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
     history_obj = {
         'X_val': X_test,
         'y_val': y_test
-    } if history else {}
+    } if trace else {}
 
-    model.fit(X_train, y_train, **history_obj)
+    history = model.fit(X_train, y_train, **history_obj)
+    mse, r2, mape  = model.make_metrics(X_test, y_test)
 
-    print(mean_squared_error(y_test, model.predict(X_test)))
+    response = {
+        'mse': mse,
+        'r2': r2,
+        'mape': mape,
+        'history': history if trace else None
+    }
+    return response

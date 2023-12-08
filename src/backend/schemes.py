@@ -9,15 +9,14 @@ class ModelStats(BaseModel):
     mape: float
 
 
-class ModelTrainDefaultResponse(BaseModel):
+class ModelTrainResponse(BaseModel):
+    class _ModelHistory(BaseModel):
+        mse: List[float]
+        r2: List[float]
+        mape: List[float]
+
+    history: _ModelHistory | None
     stats: ModelStats
-
-
-class ModelTrainHistoricResponse(ModelTrainDefaultResponse):
-    RMSE_history: List[float]
-    R2_history: List[float]
-    smape_history: List[float]
-    mape_history: List[float]
 
 
 class Configuration(BaseModel):

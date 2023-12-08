@@ -3,7 +3,7 @@ import { Form, FloatingLabel } from 'react-bootstrap'
 import ModelParams from './UI/ModelParams/ModelParams'
 import DataSetDefiner from './DataSetDefiner'
 
-const ModelSettings = ({ }) => {
+const ModelSettings = ({addHistory}) => {
 
     const [config, setConfig] = useState({
         model: 'random-forest'
@@ -28,7 +28,7 @@ const ModelSettings = ({ }) => {
                 </Form.Control>
             </FloatingLabel>
             <ModelParams modelType={config['model']} config={config} />
-            <DataSetDefiner config={config}/>
+            <DataSetDefiner config={config} addHistory={addHistory} />
         </div>
     )
 }

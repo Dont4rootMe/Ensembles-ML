@@ -5,7 +5,7 @@ import {FloatingLabel} from "react-bootstrap";
 import DataUploader from "./UI/DataUploader/DataUploader";
 import SynteticDataGenerator from "./UI/SynteticDataGenerator/SynteticDataGenerator";
 
-const DataSetDefiner = ({config}) => {
+const DataSetDefiner = ({config, addHistory}) => {
     const [dataSetType, setDataSetType] = useState('synt')
 
     return (
@@ -29,7 +29,8 @@ const DataSetDefiner = ({config}) => {
                 </Form.Control>
             </FloatingLabel>
 
-            {dataSetType === 'synt' ? <SynteticDataGenerator config={config}/> : <DataUploader config={config}/>}
+            {dataSetType === 'synt' ? <SynteticDataGenerator config={config} addHistory={addHistory} /> 
+                                    : <DataUploader config={config} addHistory={addHistory} />}
         </Form.Group>
   );
 }
