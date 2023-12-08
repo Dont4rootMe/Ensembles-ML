@@ -15,7 +15,7 @@ function App() {
   // useEffect(() => {console.log('spotted!!')}, [modelHistoryLine])
 
   const addHistory = (history) => {
-    setModelHistoryLine([...modelHistoryLine, {'key': historyOffTop, 'history': history}])
+    setModelHistoryLine([{'key': historyOffTop, 'history': history}, ...modelHistoryLine ])
     setHistoryOffTop(historyOffTop + 1)
   }
 

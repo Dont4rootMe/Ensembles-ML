@@ -5,7 +5,7 @@ import Plot from 'react-plotly.js';
 const SmartPlot = ({data}) => {
     return (
         <Tabs
-        defaultActiveKey="profile"
+        defaultActiveKey="hider"
         id="uncontrolled-tab-example"
         className="mb-3"
         style={{padding: '5px'}}

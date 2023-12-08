@@ -10,8 +10,8 @@ import ensembles
 
 from sklearn.metrics import mean_squared_error
 
-def make_syntetic_dataset(sample_size: int, feature_size: int, percent: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    X, y = make_regression(sample_size, feature_size)
+def make_syntetic_dataset(sample_size: int, feature_size: int, percent: int, randomState: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    X, y = make_regression(sample_size, feature_size, random_state=randomState)
 
     return train_test_split(X, y, test_size=(percent / 100))
 
@@ -59,7 +59,7 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
     mse, r2, mape  = model.make_metrics(X_test, y_test)
 
     response = {
-        'model': 'Random forest',
+        'model': 'Gradient Boosting',
         'mse': mse,
         'r2': r2,
         'mape': mape,

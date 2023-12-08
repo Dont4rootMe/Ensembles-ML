@@ -24,7 +24,7 @@ const SynteticDataGenerator = ({config, addHistory}) => {
                        sample_size: sampleSize, 
                        feature_size: featureSize, 
                        validation_percent: validationSplitter,
-                       config: config
+                       config: {...config}
         }
 
         const reply = await call_post('http://localhost:8000/syntet-train', config, {trace: trace})

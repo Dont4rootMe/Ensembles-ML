@@ -26,7 +26,8 @@ app.add_middleware(
 def train_on_syntetic_dataset(config: schemes.ConfigurationSyntet, trace: bool):
     X_train, X_test, y_train, y_test = engine.make_syntetic_dataset(config.synt_prefs.sample_size, 
                                                                     config.synt_prefs.feature_size,
-                                                                    config.synt_prefs.validation_percent)
+                                                                    config.synt_prefs.validation_percent,
+                                                                    config.randomState)
     if config.model == 'random-forest':
         return engine.train_random_forest(X_train, X_test, y_train, y_test, config, trace)
     if config.model == 'grad-boosting':

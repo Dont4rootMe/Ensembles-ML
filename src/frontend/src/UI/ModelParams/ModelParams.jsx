@@ -6,6 +6,21 @@ import { addMessage } from "../../ToastFactory";
 let lastKeyDownMesage = Date.now() - 5000
 
 const ModelParams = ({ modelType, config }) => {
+    const [estimators, setEstimators] = useState('10')
+
+    const [depth, setDepth] = useState('100')
+    const [useMaxDepth, setUseMaxDepth] = useState(false)
+
+    const [fetSubsample, setFetSubsample] = useState('')
+
+    const [useRandomSplit, setUseRandomSplit] = useState(false)
+
+    const [bootstrapCoef, setBootstrapCoef] = useState('')
+    const [useBootstraping, setUseBootstraping] = useState(false)
+
+    const [randomState, setRandomState] = useState('42')
+
+    const [learningRate, setLearningRate] = useState('0.1')
 
     const checkNumericInput = (e, value, dotAcceptable=false) => {
         if (e.nativeEvent.inputType === 'deleteContentBackward') {
@@ -24,37 +39,23 @@ const ModelParams = ({ modelType, config }) => {
 
     }
 
+    useEffect(() => {
+        if (config) {
+            config.estimators = estimators
+            config.depth = useMaxDepth ? depth : null
+            config.fetSubsample = fetSubsample === '' ? 1/3 : fetSubsample
+            config.useRandomSplit = useRandomSplit
+            config.bootstrapCoef = useBootstraping ? bootstrapCoef : null
+            config.randomState = randomState === '' ? null : randomState
+            config.learningRate = modelType==='grad-boosting' ? learningRate : null
+        }
+    }, [config, estimators, depth, useMaxDepth, fetSubsample, useRandomSplit, bootstrapCoef, useBootstraping, randomState, learningRate])
 
-    const _Settings = ({type}) => {
-        const [estimators, setEstimators] = useState('10')
 
-        const [depth, setDepth] = useState('100')
-        const [useMaxDepth, setUseMaxDepth] = useState(false)
-
-        const [fetSubsample, setFetSubsample] = useState('')
-
-        const [useRandomSplit, setUseRandomSplit] = useState(false)
-
-        const [bootstrapCoef, setBootstrapCoef] = useState('')
-        const [useBootstraping, setUseBootstraping] = useState(false)
-
-        const [randomState, setRandomState] = useState('42')
-
-        const [learningRate, setLearningRate] = useState('0.1')
-
-        useEffect(() => {
-            if (config) {
-                config.estimators = estimators
-                config.depth = useMaxDepth ? depth : null
-                config.fetSubsample = fetSubsample === '' ? 1/3 : fetSubsample
-                config.useRandomSplit = useRandomSplit
-                config.bootstrapCoef = useBootstraping ? bootstrapCoef : null
-                config.randomState = randomState === '' ? null : randomState
-                config.learningRate = type==='grad-boosting' ? learningRate : null
-            }
-        }, [config, estimators, depth, useMaxDepth, fetSubsample, useRandomSplit, bootstrapCoef, useBootstraping, randomState, learningRate])
-
-        return (
+    return (
+        <div style={{marginTop: '3%', display: 'flex', flexDirection: 'column',
+                     border: '1px solid rgb(0,0,0, 0.1)', borderRadius: '5px', padding: '5px'}}>
+            <span style={{fontSize: '1.2em', marginBottom: '10px'}}><strong>Гиперпараметры модели:</strong></span>
             <>
                <InputGroup size="sm" className="mb-3">
                     <InputGroup.Text id="inputGroup-sizing-sm">Число деревьев</InputGroup.Text>
@@ -137,7 +138,7 @@ const ModelParams = ({ modelType, config }) => {
                 </InputGroup>
 
                 {
-                    type == 'grad-boosting' && 
+                    modelType == 'grad-boosting' && 
                     <InputGroup size="sm" className="mb-3">
                         <InputGroup.Text id="inputGroup-sizing-sm">learning rate</InputGroup.Text>
                         <Form.Control
@@ -150,14 +151,6 @@ const ModelParams = ({ modelType, config }) => {
                     </InputGroup>
                 }
             </>
-        )
-    }
-
-    return (
-        <div style={{marginTop: '3%', display: 'flex', flexDirection: 'column',
-                     border: '1px solid rgb(0,0,0, 0.1)', borderRadius: '5px', padding: '5px'}}>
-            <span style={{fontSize: '1.2em', marginBottom: '10px'}}><strong>Гиперпараметры модели:</strong></span>
-            <_Settings type={modelType}/>
 
         </div>
     )

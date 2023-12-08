@@ -9,7 +9,7 @@ const ModelHistory = ({plate, deleteHistory}) => {
     }
 
     return (
-        <Card key={plate.key}>
+        <Card key={plate.key} style={{marginBottom: '5px'}}>
             <Card.Header as="h5" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                 <div style={{display: 'flex'}}>
                     <Badge bg="primary">{`model №${plate.key + 1}`}</Badge>
@@ -21,7 +21,7 @@ const ModelHistory = ({plate, deleteHistory}) => {
             {plate.history.trace && <SmartPlot data={plate.history.history}/>}
 
             <Card.Body>
-                <Card.Title style={{marginBottom: '0px'}}>Данные модели</Card.Title>
+                <Card.Title style={{marginBottom: '0px'}}>Параметры модели</Card.Title>
                 <div style={{width: '100%', display: 'grid', gridTemplateColumns: '1fr 1fr',
                              gridTemplateRows: '1fr 1fr 1fr' + plate.history.model !== 'Random forest' ? ' 1fr' : ''}}>
                     <Card.Text style={{marginBottom: '0px', marginLeft: '1em', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
