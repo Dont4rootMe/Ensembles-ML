@@ -1,34 +1,20 @@
 import React, {useState, useEffect} from "react";
 import { Form, Button, InputGroup, Dropdown, DropdownButton } from "react-bootstrap";
 import RangeSlider from "react-bootstrap-range-slider";
+import { call_post, BadResponse } from "../../CALLBACKS";
+import { addWarning } from "../../ToastFactory";
+import { addDanger } from "../../ToastFactory";
 
 
-
-const DataUploader = ({config}) => {
-    const [internal_config, ] = useState({
-        autoValid: true,
-        validSize: 30, 
-        targetIndex: undefined
-    })
-
+const DataUploader = ({config, addHistory}) => {
     const [dataSet, setDataSet] = useState(undefined);
-    const [validationSet, setValidationSet] = useState(undefined);
-    const [targetIndex, setTargetIndex] = useState(undefined)
+    const [validationSet, setValidationSet] = useState(null);
+    const [targetIndex, setTargetIndex] = useState(undefined);
 
 
     const [targetList, setTargetList] = useState([])
     const [autoValid, setAutovalid] = useState(true)
     const [validSize, setValidSize] = useState(30)
-
-    useEffect(() => {
-        internal_config.targetIndex = targetIndex
-    }, [targetIndex])
-
-    useEffect(() => {
-        internal_config.autoValid = autoValid
-        internal_config.validSize = validSize
-    }, [autoValid, validSize])
-
     
     const _get_target_list = (delimiter) => {
         if (!dataSet) {return;}
@@ -42,12 +28,56 @@ const DataUploader = ({config}) => {
         };
         reader.readAsText(dataSet);
     }
+
+    useEffect(() => {
+        setTargetIndex(targetList[0])
+    }, [targetList])
+
+    useEffect(() => {
+        _get_target_list(',')
+    }, [dataSet])
+
+    const trainModel = async (trace) => {
+        if (!dataSet || (!autoValid && !validationSet)){
+            addWarning('Загрузка данных', 'Убедитесь в правильности заполнения данных для обучения модели')
+            return 
+        }
+
+        let history = {dataset: 'dataset',
+                       trace: trace, 
+                       target: targetIndex, 
+                       test_size: autoValid ? validSize : null,
+                       config: {...config}
+        }
+
+        const formData = new FormData();
+        formData.append("train", dataSet);
+        if (validSize) {
+            formData.append('test', validationSet)
+        }
+
+        const _config = {
+            ...config,
+            test_size: autoValid ? validSize : null,
+            target: targetIndex,
+            synt_prefs: undefined
+        }
+
+        const reply = await call_post('http://localhost:8000/dataset-train', formData, {..._config, trace: trace})
+        if (reply instanceof BadResponse) {
+            console.log(reply)
+            addDanger('Обучение модели', 'Что-то пошло не так')
+        } else {
+            addHistory({...history, ...reply.data})
+        }
+    }
+
     
     return (
         <>
             <Form.Group controlId="formFile" size="sm" style={{marginBottom: '5px'}}>
                 <Form.Label style={{marginBottom: '0px'}}>Выберете датасет для обучения</Form.Label>
-                <Form.Control type="file" onChange={(e) => setDataSet(e.target.files[0])} />
+                <Form.Control type="file" onChange={(e) => {_get_target_list(','); setDataSet(e.target.files[0])}} />
             </Form.Group>
             
             <>
@@ -83,10 +113,11 @@ const DataUploader = ({config}) => {
                     variant="outline-secondary"
                     title="del."
                     id="input-group-dropdown-1"
+                    defaultValue={'sep-,'}
                     >
-                        <Dropdown.Item onClick={() => _get_target_list(',')}>delimiter:   ","</Dropdown.Item>
-                        <Dropdown.Item onClick={() => _get_target_list(';')}>delimiter:   ";"</Dropdown.Item>
-                        <Dropdown.Item onClick={() => _get_target_list('\t')}>delimiter:   "\t"</Dropdown.Item>
+                        <Dropdown.Item value={'sep-,'} onClick={() => _get_target_list(',')}>delimiter:   ","</Dropdown.Item>
+                        <Dropdown.Item value={'sep-;'} onClick={() => _get_target_list(';')}>delimiter:   ";"</Dropdown.Item>
+                        <Dropdown.Item value={'sep-t'} onClick={() => _get_target_list('\t')}>delimiter:   "\t"</Dropdown.Item>
 
                     </DropdownButton>
                     <Form.Select aria-label="Text input with dropdown button" 
@@ -100,9 +131,20 @@ const DataUploader = ({config}) => {
                 </InputGroup>
             </Form>
 
-            <Button variant='success' 
-                    style={{marginTop: '10px'}}
-            >Обучить модель!</Button>
+            <Dropdown >
+                <Dropdown.Toggle variant="success" style={{marginTop: '10px'}}>
+                    Обучить модель!
+                </Dropdown.Toggle>
+
+                <Dropdown.Menu>
+                    <Dropdown.Item href="#/action-historic-on" 
+                        onClick={() => trainModel(true)}
+                    >Показать историю</Dropdown.Item>
+                    <Dropdown.Item href="#/action-historic-off"
+                        onClick={() => trainModel(false)}
+                    >Без истории</Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
         </>
     )
 }

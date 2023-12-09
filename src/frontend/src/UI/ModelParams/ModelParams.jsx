@@ -15,7 +15,7 @@ const ModelParams = ({ modelType, config }) => {
 
     const [useRandomSplit, setUseRandomSplit] = useState(false)
 
-    const [bootstrapCoef, setBootstrapCoef] = useState('')
+    const [bootstrapCoef, setBootstrapCoef] = useState(null)
     const [useBootstraping, setUseBootstraping] = useState(false)
 
     const [randomState, setRandomState] = useState('42')
@@ -45,7 +45,7 @@ const ModelParams = ({ modelType, config }) => {
             config.depth = useMaxDepth ? depth : null
             config.fetSubsample = fetSubsample === '' ? 1/3 : fetSubsample
             config.useRandomSplit = useRandomSplit
-            config.bootstrapCoef = useBootstraping ? bootstrapCoef : null
+            config.bootstrapCoef = useBootstraping ? (bootstrapCoef instanceof Number ? Number(bootstrapCoef) : parseFloat(bootstrapCoef)) : null
             config.randomState = randomState === '' ? null : randomState
             config.learningRate = modelType==='grad-boosting' ? learningRate : null
         }
@@ -107,7 +107,7 @@ const ModelParams = ({ modelType, config }) => {
                 />
 
                 <InputGroup size="sm" style={{marginBottom: '5px'}}>
-                    <InputGroup.Text id="inputGroup-sizing-sm">Глубина деревьев</InputGroup.Text>
+                    <InputGroup.Text id="inputGroup-sizing-sm">Бутстрап</InputGroup.Text>
                     <Form.Control
                         aria-label="Small"
                         aria-describedby="inputGroup-sizing-sm"

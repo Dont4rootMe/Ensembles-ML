@@ -1,5 +1,6 @@
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
+import pandas as pd
 import numpy as np
 from typing import Tuple
 import sys
@@ -14,6 +15,15 @@ def make_syntetic_dataset(sample_size: int, feature_size: int, percent: int, ran
     X, y = make_regression(sample_size, feature_size, random_state=randomState)
 
     return train_test_split(X, y, test_size=(percent / 100))
+
+def make_train_test_dataset(dataset: pd.DataFrame, target: str, test_size: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    X = dataset.drop(columns=[target])
+    y = dataset[target]
+
+    return train_test_split(X, y, test_size=(test_size / 100))
+
+def proccess_file(file):
+    return pd.read_csv(file.file)
 
 def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration, trace: bool):
     model: ensembles.RandomForestMSE = ensembles.RandomForestMSE(

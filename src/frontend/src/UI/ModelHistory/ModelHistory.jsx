@@ -14,6 +14,8 @@ const ModelHistory = ({plate, deleteHistory}) => {
                 <div style={{display: 'flex'}}>
                     <Badge bg="primary">{`model №${plate.key + 1}`}</Badge>
                     <span style={{marginLeft: '5px'}}>{plate.history.model}</span>
+                    {plate.history.dataset === 'dataset' ? <small style={{marginLeft: '0.8em'}}>
+                        {`target: ${plate.history.target}`}</small> : ''}
                 </div>
                 <CloseButton onClick={() => deleteHistory(plate.key)}/>
             </Card.Header>
