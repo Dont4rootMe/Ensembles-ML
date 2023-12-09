@@ -38,8 +38,17 @@ const DataUploader = ({config, addHistory}) => {
     }, [dataSet])
 
     const trainModel = async (trace) => {
-        if (!dataSet || (!autoValid && !validationSet)){
-            addWarning('Загрузка данных', 'Убедитесь в правильности заполнения данных для обучения модели')
+
+        if (!dataSet) {
+            addWarning('Загрузка данных', 'Вы не указали данные для обучения. Вам доступна опция синтетического датасета.')
+            return;
+        }
+        if (!autoValid && !validationSet) {
+            addWarning('Загрузка теста', 'Вам требуется указать данные, такого же образца, что и train, для теста модели')
+            return;
+        }
+        if (!targetIndex) {
+            addWarning('Выбор target переменной', 'Вам требуется указать переменную, считаемую таргетом')
             return 
         }
 

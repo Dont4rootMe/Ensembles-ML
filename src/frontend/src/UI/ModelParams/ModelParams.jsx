@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import InputGroupText from "react-bootstrap/esm/InputGroupText";
 import { InputGroup, Form } from "react-bootstrap";
-import { addMessage } from "../../ToastFactory";
+import { addMessage, addWarning } from "../../ToastFactory";
 
 let lastKeyDownMesage = Date.now() - 5000
 
@@ -50,6 +50,13 @@ const ModelParams = ({ modelType, config }) => {
             config.learningRate = modelType==='grad-boosting' ? learningRate : null
         }
     }, [config, estimators, depth, useMaxDepth, fetSubsample, useRandomSplit, bootstrapCoef, useBootstraping, randomState, learningRate])
+
+
+    useEffect(() => {
+        if (estimators.length  <= 0) {
+            addWarning('Число деревьев', 'Число деревьев не должно равняться нулю')
+        }
+    }, [estimators])
 
 
     return (
