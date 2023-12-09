@@ -54,9 +54,15 @@ const ModelParams = ({ modelType, config }) => {
 
     useEffect(() => {
         if (estimators.length  <= 0) {
-            addWarning('Число деревьев', 'Число деревьев не должно равняться нулю')
+            addWarning('Число деревьев', 'Число деревьев задается явно')
         }
     }, [estimators])
+
+    useEffect(() => {
+        if (learningRate.length <= 0) {
+            addWarning('Выбор learning rate', 'Параметр необходимо явно задать')
+        }
+    }, [learningRate])
 
 
     return (

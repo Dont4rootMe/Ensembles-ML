@@ -52,6 +52,15 @@ const DataUploader = ({config, addHistory}) => {
             return 
         }
 
+        if (config.learningRate.length <= 0 && config.model === 'grad-boosting') {
+            addDanger('Learning rate', 'Задайте явным образом learning rate') 
+            return
+        }
+        if (config.estimators.length <= 0 ) {
+            addDanger('Число деревьев', 'Задайте явным образом параметр модели') 
+            return
+        }
+
         let history = {dataset: 'dataset',
                        trace: trace, 
                        target: targetIndex, 

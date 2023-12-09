@@ -20,6 +20,16 @@ const SynteticDataGenerator = ({config, addHistory}) => {
 
 
     const trainModel = async (trace) => {
+        if (config.estimators.length <= 0 ) {
+            addDanger('Число деревьев', 'Задайте явным образом параметр модели') 
+            return
+        }
+        if (config.learningRate.length <= 0 && config.model === 'grad-boosting') {
+            addDanger('Learning rate', 'Задайте явным образом learning rate') 
+            return
+        }
+        
+
         let history = {dataset: 'synt',
                        trace: trace, 
                        sample_size: sampleSize, 
