@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import { Form, Button, InputGroup, Dropdown, DropdownButton } from "react-bootstrap";
 import RangeSlider from "react-bootstrap-range-slider";
 import { call_post, BadResponse } from "../../CALLBACKS";
-import { addWarning } from "../../ToastFactory";
+import { addMessage, addSuccess, addWarning } from "../../ToastFactory";
 import { addDanger } from "../../ToastFactory";
 
 
@@ -60,6 +60,8 @@ const DataUploader = ({config, addHistory}) => {
             addDanger('Число деревьев', 'Задайте явным образом параметр модели') 
             return
         }
+        
+        addMessage('Обучение модели', 'Обучение модели учпешно началось')
 
         let history = {dataset: 'dataset',
                        trace: trace, 
@@ -83,9 +85,9 @@ const DataUploader = ({config, addHistory}) => {
 
         const reply = await call_post('http://localhost:8000/dataset-train', formData, {..._config, trace: trace})
         if (reply instanceof BadResponse) {
-            console.log(reply)
-            addDanger('Обучение модели', 'Что-то пошло не так')
+            addDanger('Что-то пошло не так', `Detail: ${reply.detail}`)
         } else {
+            addSuccess('Обучение модели', 'Модель обучилась успешно')
             addHistory({...history, ...reply.data})
         }
     }

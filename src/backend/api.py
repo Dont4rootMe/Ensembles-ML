@@ -2,12 +2,12 @@ import uvicorn
 from fastapi import FastAPI, UploadFile, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from settings import BACKEND_URL
-from fastapi.responses import JSONResponse
+from fastapi.exceptions import HTTPException
 
 import schemes
 import engine
 
-from typing import List, Optional, Any
+from typing import Optional
 
 origins = [
     "http://localhost",
@@ -50,15 +50,26 @@ async def train_on_specified_data(
         bootstrapCoef: Optional[float | int] = None,
         learningRate: Optional[float] = None,
         ):
-
-    train = engine.proccess_file(train)
+    try:
+        train = engine.proccess_file(train)
+    except:
+        raise HTTPException(status_code=500, detail='Непарсящийся формат данных train')
     if test_size is None:
-        X_train = train.drop(columns=[target])
-        y_train = train[target]
+        try:
+            X_train = train.drop(columns=[target])
+            y_train = train[target]
+        except:
+            raise HTTPException(status_code=500, detail=f'Отсутсвует колонка {target}')
 
-        test = engine.proccess_file(test)
-        X_test = test.drop(columns=[target])
-        y_test = test[target]
+        try:
+            test = engine.proccess_file(test)
+        except:
+            raise HTTPException(status_code=500, detail='Непарсящийся формат данных test')
+        try:
+            X_test = test.drop(columns=[target])
+            y_test = test[target]
+        except:
+            raise HTTPException(status_code=500, detail=f'Отсутсвует колонка {target}')
     else:
         X_train, X_test, y_train, y_test = engine.make_train_test_dataset(train, target, test_size)
 
@@ -72,8 +83,6 @@ async def train_on_specified_data(
         useRandomSplit=useRandomSplit,
         learningRate=learningRate
     )
-
-    print(config)
 
     if config.model == 'random-forest':
         return engine.train_random_forest(X_train, X_test, y_train, y_test, config, trace)

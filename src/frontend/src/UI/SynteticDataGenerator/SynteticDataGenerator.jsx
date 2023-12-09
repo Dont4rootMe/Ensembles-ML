@@ -2,7 +2,7 @@ import React, {useState, useEffect} from "react";
 import { Form, Button, Dropdown } from "react-bootstrap";
 import RangeSlider from 'react-bootstrap-range-slider';
 import { call_post, BadResponse } from "../../CALLBACKS";
-import { addDanger } from "../../ToastFactory";
+import { addDanger, addMessage, addSuccess } from "../../ToastFactory";
 
 const SynteticDataGenerator = ({config, addHistory}) => {
     const [sampleSize, setSampleSize] = useState(30000)
@@ -29,6 +29,7 @@ const SynteticDataGenerator = ({config, addHistory}) => {
             return
         }
         
+        addMessage('Обучение модели', 'Обучение модели учпешно началось')
 
         let history = {dataset: 'synt',
                        trace: trace, 
@@ -40,9 +41,9 @@ const SynteticDataGenerator = ({config, addHistory}) => {
 
         const reply = await call_post('http://localhost:8000/syntet-train', config, {trace: trace})
         if (reply instanceof BadResponse) {
-            console.log(reply)
             addDanger('Обучение модели', 'Что-то пошло не так')
         } else {
+            addSuccess('Обучение модели', 'Модель обучилась успешно')
             addHistory({...history, ...reply.data})
         }
     }
