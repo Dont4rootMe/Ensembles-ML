@@ -52,7 +52,7 @@ const DataUploader = ({config, addHistory}) => {
             return 
         }
 
-        if (config.learningRate.length <= 0 && config.model === 'grad-boosting') {
+        if (config.model === 'grad-boosting' && config.learningRate.length <= 0) {
             addDanger('Learning rate', 'Задайте явным образом learning rate') 
             return
         }

@@ -51,7 +51,6 @@ const ModelParams = ({ modelType, config }) => {
         }
     }, [config, estimators, depth, useMaxDepth, fetSubsample, useRandomSplit, bootstrapCoef, useBootstraping, randomState, learningRate])
 
-
     useEffect(() => {
         if (estimators.length  <= 0) {
             addWarning('Число деревьев', 'Число деревьев задается явно')

@@ -8,6 +8,8 @@ const ModelHistory = ({plate, deleteHistory}) => {
         return (float.toFixed(precision))
     }
 
+    console.log(plate)
+
     return (
         <Card key={plate.key} style={{marginBottom: '5px'}}>
             <Card.Header as="h5" style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
@@ -55,6 +57,9 @@ const ModelHistory = ({plate, deleteHistory}) => {
                 <Card.Title style={{marginBottom: '0px'}} >Конечные статистики</Card.Title>
                 <Card.Text style={{marginBottom: '0px', marginLeft: '1em'}}>
                     {plate.history.mse && (`MSE: ${getFloatPrecision(plate.history.mse)}`)}
+                </Card.Text>
+                <Card.Text style={{marginBottom: '0px', marginLeft: '1em'}}>
+                    {plate.history.mae && (`MAE: ${getFloatPrecision(plate.history.mae)}`)}
                 </Card.Text>
                 <Card.Text style={{marginBottom: '0px', marginLeft: '1em'}}>
                     {plate.history.mape && (`MAPE: ${getFloatPrecision(plate.history.mape)}`)}
