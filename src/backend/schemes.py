@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List, Any
 from fastapi import Form
 
+
 class ModelTrainResponse(BaseModel):
     class _ModelHistory(BaseModel):
         mse: List[float]
@@ -27,6 +28,7 @@ class Configuration(BaseModel):
     useRandomSplit: bool
     learningRate: float | None
 
+
 class ConfigurationSyntet(Configuration):
     class _syntet_pref(BaseModel):
         sample_size: int
@@ -36,7 +38,7 @@ class ConfigurationSyntet(Configuration):
     synt_prefs: _syntet_pref
 
 
-class ConfigurationDataSet(Configuration): 
+class ConfigurationDataSet(Configuration):
     test_size: int | None
     target: str
 
@@ -47,22 +49,22 @@ class FormJsonDataset(ConfigurationDataSet):
 
     @classmethod
     def as_form(cls, model: str,
-                    estimators: int,
-                    fetSubsample: float | int,
-                    depth: int | None,
-                    randomState: int | None,
-                    bootstrapCoef: float | int | None,
-                    useRandomSplit: bool,
-                    learningRate: float | None,
-                    test_size: int | None,
-                    target: str):
+                estimators: int,
+                fetSubsample: float | int,
+                depth: int | None,
+                randomState: int | None,
+                bootstrapCoef: float | int | None,
+                useRandomSplit: bool,
+                learningRate: float | None,
+                test_size: int | None,
+                target: str):
         return cls(model=model,
-            estimators=estimators,
-            fetSubsample=fetSubsample,
-            depth=depth,
-            randomState=randomState,
-            bootstrapCoef=bootstrapCoef,
-            useRandomSplit=useRandomSplit,
-            learningRate=learningRate,
-            test_size=test_size,
-            target=target)
+                   estimators=estimators,
+                   fetSubsample=fetSubsample,
+                   depth=depth,
+                   randomState=randomState,
+                   bootstrapCoef=bootstrapCoef,
+                   useRandomSplit=useRandomSplit,
+                   learningRate=learningRate,
+                   test_size=test_size,
+                   target=target)

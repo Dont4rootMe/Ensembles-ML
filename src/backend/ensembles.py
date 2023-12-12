@@ -96,7 +96,7 @@ class RandomForestMSE:
                 bootstrap = self.bootstrap if isinstance(
                     self.bootstrap, int) else round(self.bootstrap * X.shape[0])
 
-        history = None      
+        history = None
         if X_val is not None and y_val is not None:
             history = {
                 'mse': [],
@@ -129,7 +129,7 @@ class RandomForestMSE:
                 history['mape'].append(mape)
 
         return self if history is None else history
-    
+
     def make_metrics(self, X, y):
         preds = self.predict(X)
 
@@ -244,8 +244,8 @@ class GradientBoostingMSE:
             else:
                 bootstrap = self.bootstrap if isinstance(
                     self.bootstrap, int) else round(self.bootstrap * X.shape[0])
-                
-        history = None      
+
+        history = None
         if X_val is not None and y_val is not None:
             history = {
                 'mse': [],
@@ -270,12 +270,12 @@ class GradientBoostingMSE:
             )
             tree = tree.fit(X[idx], grad[idx])
             preds = tree.predict(X)
-            alpha = minimize_scalar(fun=lambda a: np.sum((grad - a * preds) ** 2), bounds=(0, 10000)).x
+            alpha = minimize_scalar(fun=lambda a: np.sum(
+                (grad - a * preds) ** 2), bounds=(0, 10000)).x
 
             grad -= self.lr * alpha * preds
             self.trees.append(tree)
             self.weights.append(self.lr * alpha)
-
 
             if history is not None:
                 mse, mae, r2, mape = self.make_metrics(X_val, y_val)
@@ -309,5 +309,6 @@ class GradientBoostingMSE:
         # if model is not fitted yet raise error
         if self.trees is None or self.weights is None:
             raise ValueError('model is not fited')
-        preds = np.array([w * tree.predict(X) for w, tree in zip(self.weights, self.trees)])
+        preds = np.array([w * tree.predict(X)
+                         for w, tree in zip(self.weights, self.trees)])
         return np.sum(preds, axis=0)
