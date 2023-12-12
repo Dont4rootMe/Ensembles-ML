@@ -1,35 +1,35 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { Tabs, Tab } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 
-const SmartPlot = ({data}) => {
+const SmartPlot = ({ data }) => {
     return (
         <Tabs
-        defaultActiveKey="hider"
-        id="uncontrolled-tab-example"
-        className="mb-3"
-        style={{padding: '5px'}}
+            defaultActiveKey="hider"
+            id="uncontrolled-tab-example"
+            className="mb-3"
+            style={{ padding: '5px' }}
         >
             <Tab eventKey={'hider'} title={'Hide plot'}>
 
             </Tab>
             {
-                Object.keys(data).map(key => 
+                Object.keys(data).map(key =>
                     <Tab eventKey={key} title={key}>
-                        <Plot 
-                            layout={{width: '100%', title: `Метрика ${key}`}}
-                            data = {[{
+                        <Plot
+                            layout={{ width: '100%', title: `Метрика ${key}` }}
+                            data={[{
                                 x: [...Array(data[key].length).keys()],
                                 y: data[key],
                                 type: 'scatter',
                                 mode: 'lines+markers',
-                                marker: {color: 'red'},
+                                marker: { color: 'red' },
                             }]}
                         />
                     </Tab>
                 )
             }
-            
+
         </Tabs>
     )
 }

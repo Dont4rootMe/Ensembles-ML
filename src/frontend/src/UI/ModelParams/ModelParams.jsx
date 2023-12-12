@@ -22,13 +22,13 @@ const ModelParams = ({ modelType, config }) => {
 
     const [learningRate, setLearningRate] = useState('0.1')
 
-    const checkNumericInput = (e, value, dotAcceptable=false) => {
+    const checkNumericInput = (e, value, dotAcceptable = false) => {
         if (e.nativeEvent.inputType === 'deleteContentBackward') {
             return value.substring(0, value.length - 1)
         }
-        if (e.nativeEvent.inputType === 'insertText' && 
-            ((e.nativeEvent.data >= '0' && e.nativeEvent.data <= '9') || 
-             (dotAcceptable && e.nativeEvent.data === '.'))) {
+        if (e.nativeEvent.inputType === 'insertText' &&
+            ((e.nativeEvent.data >= '0' && e.nativeEvent.data <= '9') ||
+                (dotAcceptable && e.nativeEvent.data === '.'))) {
             return value + e.nativeEvent.data
         }
         if (Date.now() - lastKeyDownMesage > 5000) {
@@ -43,16 +43,16 @@ const ModelParams = ({ modelType, config }) => {
         if (config) {
             config.estimators = estimators
             config.depth = useMaxDepth ? depth : null
-            config.fetSubsample = fetSubsample === '' ? 1/3 : fetSubsample
+            config.fetSubsample = fetSubsample === '' ? 1 / 3 : fetSubsample
             config.useRandomSplit = useRandomSplit
             config.bootstrapCoef = useBootstraping ? (bootstrapCoef instanceof Number ? Number(bootstrapCoef) : parseFloat(bootstrapCoef)) : null
             config.randomState = randomState === '' ? null : randomState
-            config.learningRate = modelType==='grad-boosting' ? learningRate : null
+            config.learningRate = modelType === 'grad-boosting' ? learningRate : null
         }
     }, [config, estimators, depth, useMaxDepth, fetSubsample, useRandomSplit, bootstrapCoef, useBootstraping, randomState, learningRate])
 
     useEffect(() => {
-        if (estimators.length  <= 0) {
+        if (estimators.length <= 0) {
             addWarning('Число деревьев', 'Число деревьев задается явно')
         }
     }, [estimators])
@@ -65,11 +65,13 @@ const ModelParams = ({ modelType, config }) => {
 
 
     return (
-        <div style={{marginTop: '3%', display: 'flex', flexDirection: 'column',
-                     border: '1px solid rgb(0,0,0, 0.1)', borderRadius: '5px', padding: '5px'}}>
-            <span style={{fontSize: '1.2em', marginBottom: '10px'}}><strong>Гиперпараметры модели:</strong></span>
+        <div style={{
+            marginTop: '3%', display: 'flex', flexDirection: 'column',
+            border: '1px solid rgb(0,0,0, 0.1)', borderRadius: '5px', padding: '5px'
+        }}>
+            <span style={{ fontSize: '1.2em', marginBottom: '10px' }}><strong>Гиперпараметры модели:</strong></span>
             <>
-               <InputGroup size="sm" className="mb-3">
+                <InputGroup size="sm" className="mb-3">
                     <InputGroup.Text id="inputGroup-sizing-sm">Число деревьев</InputGroup.Text>
                     <Form.Control
                         aria-label="Small"
@@ -79,7 +81,7 @@ const ModelParams = ({ modelType, config }) => {
                     />
                 </InputGroup>
 
-                <InputGroup size="sm" style={{marginBottom: '5px'}}>
+                <InputGroup size="sm" style={{ marginBottom: '5px' }}>
                     <InputGroup.Text id="inputGroup-sizing-sm">Глубина деревьев</InputGroup.Text>
                     <Form.Control
                         aria-label="Small"
@@ -90,7 +92,7 @@ const ModelParams = ({ modelType, config }) => {
                     />
                 </InputGroup>
                 <Form.Check
-                    style={{fontSize: '0.8em'}}
+                    style={{ fontSize: '0.8em' }}
                     type={'checkbox'}
                     label={`Не задавать максимальную глубину деревьев`}
                     id={`disabled-default-maxdepth`}
@@ -98,7 +100,7 @@ const ModelParams = ({ modelType, config }) => {
                     onChange={() => setUseMaxDepth(!useMaxDepth)}
                 />
 
-                <InputGroup size="sm" style={{marginTop: '0.6rem'}}>
+                <InputGroup size="sm" style={{ marginTop: '0.6rem' }}>
                     <InputGroup.Text id="inputGroup-sizing-sm">Число признаков</InputGroup.Text>
                     <Form.Control
                         aria-label="Small"
@@ -109,8 +111,8 @@ const ModelParams = ({ modelType, config }) => {
                     />
                 </InputGroup>
 
-                <Form.Check 
-                    style={{marginTop: '0.6rem'}}
+                <Form.Check
+                    style={{ marginTop: '0.6rem' }}
                     type="switch"
                     id="switch-strategy"
                     label="Стратегия ветвления random"
@@ -118,7 +120,7 @@ const ModelParams = ({ modelType, config }) => {
                     onChange={() => setUseRandomSplit(!useRandomSplit)}
                 />
 
-                <InputGroup size="sm" style={{marginBottom: '5px'}}>
+                <InputGroup size="sm" style={{ marginBottom: '5px' }}>
                     <InputGroup.Text id="inputGroup-sizing-sm">Бутстрап</InputGroup.Text>
                     <Form.Control
                         aria-label="Small"
@@ -130,7 +132,7 @@ const ModelParams = ({ modelType, config }) => {
                     />
                 </InputGroup>
                 <Form.Check
-                    style={{fontSize: '0.8em'}}
+                    style={{ fontSize: '0.8em' }}
                     type={'checkbox'}
                     label={`Не использовать bootstraping`}
                     id={`disabled-default-bootstrap`}
@@ -150,7 +152,7 @@ const ModelParams = ({ modelType, config }) => {
                 </InputGroup>
 
                 {
-                    modelType == 'grad-boosting' && 
+                    modelType == 'grad-boosting' &&
                     <InputGroup size="sm" className="mb-3">
                         <InputGroup.Text id="inputGroup-sizing-sm">learning rate</InputGroup.Text>
                         <Form.Control

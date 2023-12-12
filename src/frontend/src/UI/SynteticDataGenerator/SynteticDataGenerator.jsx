@@ -1,16 +1,16 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Button, Dropdown } from "react-bootstrap";
 import RangeSlider from 'react-bootstrap-range-slider';
 import { call_post, BadResponse } from "../../CALLBACKS";
 import { addDanger, addMessage, addSuccess } from "../../ToastFactory";
 
-const SynteticDataGenerator = ({config, addHistory}) => {
+const SynteticDataGenerator = ({ config, addHistory }) => {
     const [sampleSize, setSampleSize] = useState(30000)
     const [featureSize, setFeatureSize] = useState(15)
     const [validationSplitter, setValidationSplitter] = useState('30')
 
     useEffect(() => {
-        if (!config) {return;}
+        if (!config) { return; }
         config.synt_prefs = {
             sample_size: sampleSize,
             feature_size: featureSize,
@@ -20,31 +20,32 @@ const SynteticDataGenerator = ({config, addHistory}) => {
 
 
     const trainModel = async (trace) => {
-        if (config.estimators.length <= 0 ) {
-            addDanger('Число деревьев', 'Задайте явным образом параметр модели') 
+        if (config.estimators.length <= 0) {
+            addDanger('Число деревьев', 'Задайте явным образом параметр модели')
             return
         }
         if (config.model === 'grad-boosting' && config.learningRate.length <= 0) {
-            addDanger('Learning rate', 'Задайте явным образом learning rate') 
+            addDanger('Learning rate', 'Задайте явным образом learning rate')
             return
         }
-        
+
         addMessage('Обучение модели', 'Обучение модели учпешно началось')
 
-        let history = {dataset: 'synt',
-                       trace: trace, 
-                       sample_size: sampleSize, 
-                       feature_size: featureSize, 
-                       validation_percent: validationSplitter,
-                       config: {...config}
+        let history = {
+            dataset: 'synt',
+            trace: trace,
+            sample_size: sampleSize,
+            feature_size: featureSize,
+            validation_percent: validationSplitter,
+            config: { ...config }
         }
 
-        const reply = await call_post('http://localhost:8000/syntet-train', config, {trace: trace})
+        const reply = await call_post('http://localhost:8000/syntet-train', config, { trace: trace })
         if (reply instanceof BadResponse) {
             addDanger('Обучение модели', 'Что-то пошло не так')
         } else {
             addSuccess('Обучение модели', 'Модель обучилась успешно')
-            addHistory({...history, ...reply.data})
+            addHistory({ ...history, ...reply.data })
         }
     }
 
@@ -52,7 +53,7 @@ const SynteticDataGenerator = ({config, addHistory}) => {
         <>
             <Form.Group size="sm">
                 <Form.Text size="mm">{`Количество объектов: ${sampleSize}`}</Form.Text>
-                <RangeSlider 
+                <RangeSlider
                     max={100000}
                     min={1000}
                     variant='warning'
@@ -62,7 +63,7 @@ const SynteticDataGenerator = ({config, addHistory}) => {
             </Form.Group>
             <Form.Group size="sm">
                 <Form.Text size="mm">{`Число признаков: ${featureSize}`}</Form.Text>
-                <RangeSlider 
+                <RangeSlider
                     max={150}
                     min={5}
                     variant='warning'
@@ -73,7 +74,7 @@ const SynteticDataGenerator = ({config, addHistory}) => {
 
             <Form.Group size="sm">
                 <Form.Text size="mm">{`Доля на тест: ${validationSplitter}%`}</Form.Text>
-                <RangeSlider 
+                <RangeSlider
                     max={50}
                     min={10}
                     variant='primary'
@@ -84,12 +85,12 @@ const SynteticDataGenerator = ({config, addHistory}) => {
             </Form.Group>
 
             <Dropdown >
-                <Dropdown.Toggle variant="success" style={{marginTop: '10px'}}>
+                <Dropdown.Toggle variant="success" style={{ marginTop: '10px' }}>
                     Обучить модель!
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
-                    <Dropdown.Item href="#/action-historic-on" 
+                    <Dropdown.Item href="#/action-historic-on"
                         onClick={() => trainModel(true)}
                     >Показать историю</Dropdown.Item>
                     <Dropdown.Item href="#/action-historic-off"
