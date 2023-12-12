@@ -5,12 +5,14 @@ from fastapi import Form
 class ModelTrainResponse(BaseModel):
     class _ModelHistory(BaseModel):
         mse: List[float]
+        mae: List[float]
         r2: List[float]
         mape: List[float]
 
     history: _ModelHistory | None
     model: str
     mse: float
+    mae: float
     r2: float
     mape: float
 

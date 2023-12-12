@@ -3,7 +3,7 @@ import numpy as np
 from scipy.optimize import minimize_scalar
 from sklearn.tree import DecisionTreeRegressor
 from pandas import DataFrame, Series
-from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_percentage_error
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_percentage_error, mean_absolute_error
 
 # suppress warnings outcoming from sklearn models
 
@@ -101,7 +101,8 @@ class RandomForestMSE:
             history = {
                 'mse': [],
                 'r2': [],
-                'mape': []
+                'mape': [],
+                'mae': []
             }
 
         for _ in range(self.n_estimators):
@@ -121,8 +122,9 @@ class RandomForestMSE:
             self.trees.append(tree)
 
             if history is not None:
-                mse, r2, mape = self.make_metrics(X_val, y_val)
+                mse, mae, r2, mape = self.make_metrics(X_val, y_val)
                 history['mse'].append(mse)
+                history['mae'].append(mae)
                 history['r2'].append(r2)
                 history['mape'].append(mape)
 
@@ -132,10 +134,11 @@ class RandomForestMSE:
         preds = self.predict(X)
 
         mse = mean_squared_error(y, preds)
+        mae = mean_absolute_error(y, preds)
         r2 = r2_score(y, preds)
         mape = mean_absolute_percentage_error(y, preds)
 
-        return mse, r2, mape
+        return mse, mae, r2, mape
 
     def predict(self, X):
         """
@@ -189,6 +192,7 @@ class GradientBoostingMSE:
         random_state : int
             set the random state for estimators. 42 by default
         """
+        self.weights = None
         self.trees = None
 
         self.n_estimators = n_estimators
@@ -214,6 +218,7 @@ class GradientBoostingMSE:
         y : numpy ndarray
             Array of size n_objects
         """
+        self.weights = []
         self.trees = []
 
         # if X or y are not numpy datastructures than redefine them
@@ -245,12 +250,12 @@ class GradientBoostingMSE:
             history = {
                 'mse': [],
                 'r2': [],
-                'mape': []
+                'mape': [],
+                'mae': []
             }
 
         # initialize first target for boosting
         grad = y
-
         for _ in range(self.n_estimators):
             idx = np.random.permutation(
                 X.shape[0])[:bootstrap] if bootstrap is not None else np.arange(X.shape[0])
@@ -263,15 +268,19 @@ class GradientBoostingMSE:
                 max_depth=self.max_depth,
                 **self.trees_parameters
             )
-            tree.fit(X[idx], grad[idx])
-            self.trees.append(tree)
+            tree = tree.fit(X[idx], grad[idx])
+            preds = tree.predict(X)
+            alpha = minimize_scalar(fun=lambda a: np.sum((grad - a * preds) ** 2), bounds=(0, 10000)).x
 
-            # gradient step
-            grad = self.lr * (y - self.predict(X))
+            grad -= self.lr * alpha * preds
+            self.trees.append(tree)
+            self.weights.append(self.lr * alpha)
+
 
             if history is not None:
-                mse, r2, mape = self.make_metrics(X_val, y_val)
+                mse, mae, r2, mape = self.make_metrics(X_val, y_val)
                 history['mse'].append(mse)
+                history['mae'].append(mae)
                 history['r2'].append(r2)
                 history['mape'].append(mape)
 
@@ -281,10 +290,11 @@ class GradientBoostingMSE:
         preds = self.predict(X)
 
         mse = mean_squared_error(y, preds)
+        mae = mean_absolute_error(y, preds)
         r2 = r2_score(y, preds)
         mape = mean_absolute_percentage_error(y, preds)
 
-        return mse, r2, mape
+        return mse, mae, r2, mape
 
     def predict(self, X):
         """
@@ -297,8 +307,7 @@ class GradientBoostingMSE:
             Array of size n_objects
         """
         # if model is not fitted yet raise error
-        if self.trees is None:
+        if self.trees is None or self.weights is None:
             raise ValueError('model is not fited')
-
-        preds = np.array([tree.predict(X) for tree in self.trees])
+        preds = np.array([w * tree.predict(X) for w, tree in zip(self.weights, self.trees)])
         return np.sum(preds, axis=0)
