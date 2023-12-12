@@ -41,7 +41,7 @@ const SynteticDataGenerator = ({config, addHistory}) => {
                        config: {...config}
         }
 
-        const reply = await call_post('http://0.0.0.0:8000/syntet-train', config, {trace: trace})
+        const reply = await call_post('http://localhost:8000/syntet-train', config, {trace: trace})
         if (reply instanceof BadResponse) {
             addDanger('Обучение модели', 'Что-то пошло не так')
         } else {
