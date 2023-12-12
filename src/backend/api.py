@@ -22,9 +22,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.post('/syntet-train', response_model=schemes.ModelTrainResponse)
 async def train_on_syntetic_dataset(config: schemes.ConfigurationSyntet, trace: bool):
-    X_train, X_test, y_train, y_test = engine.make_syntetic_dataset(config.synt_prefs.sample_size, 
+    X_train, X_test, y_train, y_test = engine.make_syntetic_dataset(config.synt_prefs.sample_size,
                                                                     config.synt_prefs.feature_size,
                                                                     config.synt_prefs.validation_percent,
                                                                     config.randomState)
@@ -32,11 +33,11 @@ async def train_on_syntetic_dataset(config: schemes.ConfigurationSyntet, trace: 
         return engine.train_random_forest(X_train, X_test, y_train, y_test, config, trace)
     if config.model == 'grad-boosting':
         return engine.train_grad_boost(X_train, X_test, y_train, y_test, config, trace)
-    
+
 
 @app.post('/dataset-train', response_model=schemes.ModelTrainResponse)
 async def train_on_specified_data(
-        train: UploadFile, 
+        train: UploadFile,
         test: UploadFile | str,
         trace: bool,
         model: str,
@@ -49,29 +50,34 @@ async def train_on_specified_data(
         randomState: Optional[int] = None,
         bootstrapCoef: Optional[float | int] = None,
         learningRate: Optional[float] = None,
-        ):
+):
     try:
         train = engine.proccess_file(train)
     except:
-        raise HTTPException(status_code=500, detail='Непарсящийся формат данных train')
+        raise HTTPException(
+            status_code=500, detail='Непарсящийся формат данных train')
     if test_size is None:
         try:
             X_train = train.drop(columns=[target])
             y_train = train[target]
         except:
-            raise HTTPException(status_code=500, detail=f'Отсутсвует колонка {target}')
+            raise HTTPException(
+                status_code=500, detail=f'Отсутсвует колонка {target}')
 
         try:
             test = engine.proccess_file(test)
         except:
-            raise HTTPException(status_code=500, detail='Непарсящийся формат данных test')
+            raise HTTPException(
+                status_code=500, detail='Непарсящийся формат данных test')
         try:
             X_test = test.drop(columns=[target])
             y_test = test[target]
         except:
-            raise HTTPException(status_code=500, detail=f'Отсутсвует колонка {target}')
+            raise HTTPException(
+                status_code=500, detail=f'Отсутсвует колонка {target}')
     else:
-        X_train, X_test, y_train, y_test = engine.make_train_test_dataset(train, target, test_size)
+        X_train, X_test, y_train, y_test = engine.make_train_test_dataset(
+            train, target, test_size)
 
     config = schemes.Configuration(
         model=model,
@@ -88,7 +94,6 @@ async def train_on_specified_data(
         return engine.train_random_forest(X_train, X_test, y_train, y_test, config, trace)
     if config.model == 'grad-boosting':
         return engine.train_grad_boost(X_train, X_test, y_train, y_test, config, trace)
-
 
 
 if __name__ == '__main__':

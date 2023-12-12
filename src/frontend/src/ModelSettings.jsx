@@ -3,7 +3,7 @@ import { Form, FloatingLabel } from 'react-bootstrap'
 import ModelParams from './UI/ModelParams/ModelParams'
 import DataSetDefiner from './DataSetDefiner'
 
-const ModelSettings = ({addHistory}) => {
+const ModelSettings = ({ addHistory }) => {
 
     const [config, setConfig] = useState({
         model: 'random-forest'

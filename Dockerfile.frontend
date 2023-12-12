@@ -6,12 +6,6 @@ RUN npm install
 COPY ./src/frontend ./
 RUN npm run build 
 RUN npm install -g serve
+
 EXPOSE 3000
 CMD ["serve", "-s", "build", "-l", "3000"]
-
-# # run frontend
-# FROM node:21-alpine
-# COPY --from=node_modules /app/build ./
-# RUN npm install -g serve
-# EXPOSE 3000
-# CMD ["serve", "-s", "build", "-l", "3000"]
