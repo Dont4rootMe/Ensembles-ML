@@ -1,6 +1,7 @@
 version: '3'
 services:
   react-front: 
+    image: react-front
     build:
       context: .
       dockerfile: Dockerfile.frontend
@@ -9,9 +10,12 @@ services:
     ports:
       - "3000:3000"
   fastapi:
+    image: fastapi-back
     build:
       context: .
       dockerfile: Dockerfile.backend
+    ports:
+      - "8000:8000"
     networks:
       - inside
 networks:
