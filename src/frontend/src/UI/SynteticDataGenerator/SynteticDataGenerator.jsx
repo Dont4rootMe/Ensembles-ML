@@ -20,11 +20,13 @@ const SynteticDataGenerator = ({config, addHistory}) => {
 
 
     const trainModel = async (trace) => {
+
+        console.log(config)
         if (config.estimators.length <= 0 ) {
             addDanger('Число деревьев', 'Задайте явным образом параметр модели') 
             return
         }
-        if (config.learningRate.length <= 0 && config.model === 'grad-boosting') {
+        if (config.model === 'grad-boosting' && config.learningRate.length <= 0) {
             addDanger('Learning rate', 'Задайте явным образом learning rate') 
             return
         }
@@ -39,7 +41,7 @@ const SynteticDataGenerator = ({config, addHistory}) => {
                        config: {...config}
         }
 
-        const reply = await call_post('http://localhost:8000/syntet-train', config, {trace: trace})
+        const reply = await call_post('http://0.0.0.0:8000/syntet-train', config, {trace: trace})
         if (reply instanceof BadResponse) {
             addDanger('Обучение модели', 'Что-то пошло не так')
         } else {

@@ -52,7 +52,7 @@ const DataUploader = ({config, addHistory}) => {
             return 
         }
 
-        if (config.learningRate.length <= 0 && config.model === 'grad-boosting') {
+        if (config.model === 'grad-boosting' && config.learningRate.length <= 0) {
             addDanger('Learning rate', 'Задайте явным образом learning rate') 
             return
         }
@@ -83,7 +83,7 @@ const DataUploader = ({config, addHistory}) => {
             synt_prefs: undefined
         }
 
-        const reply = await call_post('http://localhost:8000/dataset-train', formData, {..._config, trace: trace})
+        const reply = await call_post('http://0.0.0.0:8000/dataset-train', formData, {..._config, trace: trace})
         if (reply instanceof BadResponse) {
             addDanger('Что-то пошло не так', `Detail: ${reply.detail}`)
         } else {

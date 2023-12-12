@@ -4,11 +4,9 @@ from fastapi.exceptions import HTTPException
 import pandas as pd
 import numpy as np
 from typing import Tuple
-import sys
-sys.path.insert(0, './src')
+import ensembles as ensembles
 
 from schemes import Configuration
-import ensembles
 
 from sklearn.metrics import mean_squared_error
 
@@ -50,11 +48,12 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
         history = model.fit(X_train, y_train, **history_obj)
     except:
         raise HTTPException(status_code=500, detail='Ошибка в обучении модели')
-    mse, r2, mape  = model.make_metrics(X_test, y_test)
+    mse, mae, r2, mape  = model.make_metrics(X_test, y_test)
 
     response = {
         'model': 'Random forest',
         'mse': mse,
+        'mae': mae,
         'r2': r2,
         'mape': mape,
         'history': history if trace else None
@@ -80,15 +79,16 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
         'y_val': y_test
     } if trace else {}
 
-    try:
-        history = model.fit(X_train, y_train, **history_obj)
-    except:
-        raise HTTPException(status_code=500, detail='Ошибка в обучении модели')
-    mse, r2, mape  = model.make_metrics(X_test, y_test)
+    # try:
+    history = model.fit(X_train, y_train, **history_obj)
+    # except:
+    #     raise HTTPException(status_code=500, detail='Ошибка в обучении модели')
+    mse, mae, r2, mape  = model.make_metrics(X_test, y_test)
 
     response = {
         'model': 'Gradient Boosting',
         'mse': mse,
+        'mae': mae,
         'r2': r2,
         'mape': mape,
         'history': history if trace else None
