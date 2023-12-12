@@ -20,8 +20,6 @@ const SynteticDataGenerator = ({config, addHistory}) => {
 
 
     const trainModel = async (trace) => {
-
-        console.log(config)
         if (config.estimators.length <= 0 ) {
             addDanger('Число деревьев', 'Задайте явным образом параметр модели') 
             return

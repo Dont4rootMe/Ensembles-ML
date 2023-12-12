@@ -3,12 +3,9 @@ import { Card, Button, Badge, CloseButton } from 'react-bootstrap';
 import SmartPlot from '../SmartPlot/SmartPlot';
 
 const ModelHistory = ({plate, deleteHistory}) => {
-    console.log(plate)
     const getFloatPrecision = (float, precision=4) => {
         return (float.toFixed(precision))
     }
-
-    console.log(plate)
 
     return (
         <Card key={plate.key} style={{marginBottom: '5px'}}>
