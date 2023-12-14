@@ -99,10 +99,10 @@ class RandomForestMSE:
         history = None
         if X_val is not None and y_val is not None:
             history = {
-                'mse': [],
-                'r2': [],
-                'mape': [],
-                'mae': []
+                'mse': {'train': [], 'test': []},
+                'r2': {'train': [], 'test': []},
+                'mape': {'train': [], 'test': []},
+                'mae': {'train': [], 'test': []}
             }
 
         for _ in range(self.n_estimators):
@@ -122,11 +122,17 @@ class RandomForestMSE:
             self.trees.append(tree)
 
             if history is not None:
+                mse, mae, r2, mape = self.make_metrics(X, y)
+                history['mse']['train'].append(mse)
+                history['mae']['train'].append(mae)
+                history['r2']['train'].append(r2)
+                history['mape']['train'].append(mape)
+
                 mse, mae, r2, mape = self.make_metrics(X_val, y_val)
-                history['mse'].append(mse)
-                history['mae'].append(mae)
-                history['r2'].append(r2)
-                history['mape'].append(mape)
+                history['mse']['test'].append(mse)
+                history['mae']['test'].append(mae)
+                history['r2']['test'].append(r2)
+                history['mape']['test'].append(mape)
 
         return self if history is None else history
 
@@ -248,10 +254,10 @@ class GradientBoostingMSE:
         history = None
         if X_val is not None and y_val is not None:
             history = {
-                'mse': [],
-                'r2': [],
-                'mape': [],
-                'mae': []
+                'mse': {'train': [], 'test': []},
+                'r2': {'train': [], 'test': []},
+                'mape': {'train': [], 'test': []},
+                'mae': {'train': [], 'test': []}
             }
 
         # initialize first target for boosting
@@ -278,11 +284,17 @@ class GradientBoostingMSE:
             self.weights.append(self.lr * alpha)
 
             if history is not None:
+                mse, mae, r2, mape = self.make_metrics(X, y)
+                history['mse']['train'].append(mse)
+                history['mae']['train'].append(mae)
+                history['r2']['train'].append(r2)
+                history['mape']['train'].append(mape)
+
                 mse, mae, r2, mape = self.make_metrics(X_val, y_val)
-                history['mse'].append(mse)
-                history['mae'].append(mae)
-                history['r2'].append(r2)
-                history['mape'].append(mape)
+                history['mse']['test'].append(mse)
+                history['mae']['test'].append(mae)
+                history['r2']['test'].append(r2)
+                history['mape']['test'].append(mape)
 
         return self if history is None else history
 
