@@ -19,6 +19,7 @@ class ModelTrainResponse(BaseModel):
     mae: float
     r2: float
     mape: float
+    time: float
 
 
 class Configuration(BaseModel):

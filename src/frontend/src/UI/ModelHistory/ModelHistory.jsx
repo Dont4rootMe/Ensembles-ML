@@ -66,6 +66,9 @@ const ModelHistory = ({ plate, deleteHistory }) => {
                 <Card.Text style={{ marginBottom: '0px', marginLeft: '1em' }}>
                     {plate.history.r2 && (`R^2: ${getFloatPrecision(plate.history.r2)}`)}
                 </Card.Text>
+                <Card.Text style={{ marginBottom: '0px', marginLeft: '1em' }}>
+                    {plate.history.r2 && (`Время обучения: ${getFloatPrecision(plate.history.time)} c.`)}
+                </Card.Text>
             </Card.Body>
         </Card>
     )
