@@ -99,7 +99,7 @@ class RandomForestMSE:
         history = None
         if X_val is not None and y_val is not None:
             history = {
-                'mse': {'train': [], 'test': []},
+                'rmse': {'train': [], 'test': []},
                 'r2': {'train': [], 'test': []},
                 'mape': {'train': [], 'test': []},
                 'mae': {'train': [], 'test': []}
@@ -122,14 +122,14 @@ class RandomForestMSE:
             self.trees.append(tree)
 
             if history is not None:
-                mse, mae, r2, mape = self.make_metrics(X, y)
-                history['mse']['train'].append(mse)
+                rmse, mae, r2, mape = self.make_metrics(X, y)
+                history['rmse']['train'].append(rmse)
                 history['mae']['train'].append(mae)
                 history['r2']['train'].append(r2)
                 history['mape']['train'].append(mape)
 
-                mse, mae, r2, mape = self.make_metrics(X_val, y_val)
-                history['mse']['test'].append(mse)
+                rmse, mae, r2, mape = self.make_metrics(X_val, y_val)
+                history['rmse']['test'].append(rmse)
                 history['mae']['test'].append(mae)
                 history['r2']['test'].append(r2)
                 history['mape']['test'].append(mape)
@@ -139,12 +139,12 @@ class RandomForestMSE:
     def make_metrics(self, X, y):
         preds = self.predict(X)
 
-        mse = mean_squared_error(y, preds)
+        rmse = mean_squared_error(y, preds, squared=False)
         mae = mean_absolute_error(y, preds)
         r2 = r2_score(y, preds)
         mape = mean_absolute_percentage_error(y, preds)
 
-        return mse, mae, r2, mape
+        return rmse, mae, r2, mape
 
     def predict(self, X):
         """
@@ -254,7 +254,7 @@ class GradientBoostingMSE:
         history = None
         if X_val is not None and y_val is not None:
             history = {
-                'mse': {'train': [], 'test': []},
+                'rmse': {'train': [], 'test': []},
                 'r2': {'train': [], 'test': []},
                 'mape': {'train': [], 'test': []},
                 'mae': {'train': [], 'test': []}
@@ -284,14 +284,14 @@ class GradientBoostingMSE:
             self.weights.append(self.lr * alpha)
 
             if history is not None:
-                mse, mae, r2, mape = self.make_metrics(X, y)
-                history['mse']['train'].append(mse)
+                rmse, mae, r2, mape = self.make_metrics(X, y)
+                history['rmse']['train'].append(rmse)
                 history['mae']['train'].append(mae)
                 history['r2']['train'].append(r2)
                 history['mape']['train'].append(mape)
 
-                mse, mae, r2, mape = self.make_metrics(X_val, y_val)
-                history['mse']['test'].append(mse)
+                rmse, mae, r2, mape = self.make_metrics(X_val, y_val)
+                history['rmse']['test'].append(rmse)
                 history['mae']['test'].append(mae)
                 history['r2']['test'].append(r2)
                 history['mape']['test'].append(mape)
@@ -301,12 +301,12 @@ class GradientBoostingMSE:
     def make_metrics(self, X, y):
         preds = self.predict(X)
 
-        mse = mean_squared_error(y, preds)
+        rmse = mean_squared_error(y, preds, squared=False)
         mae = mean_absolute_error(y, preds)
         r2 = r2_score(y, preds)
         mape = mean_absolute_percentage_error(y, preds)
 
-        return mse, mae, r2, mape
+        return rmse, mae, r2, mape
 
     def predict(self, X):
         """

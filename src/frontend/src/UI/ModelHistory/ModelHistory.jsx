@@ -55,7 +55,7 @@ const ModelHistory = ({ plate, deleteHistory }) => {
 
                 <Card.Title style={{ marginBottom: '0px' }} >Конечные статистики</Card.Title>
                 <Card.Text style={{ marginBottom: '0px', marginLeft: '1em' }}>
-                    {plate.history.mse && (`MSE: ${getFloatPrecision(plate.history.mse)}`)}
+                    {plate.history.rmse && (`RMSE: ${getFloatPrecision(plate.history.rmse)}`)}
                 </Card.Text>
                 <Card.Text style={{ marginBottom: '0px', marginLeft: '1em' }}>
                     {plate.history.mae && (`MAE: ${getFloatPrecision(plate.history.mae)}`)}
