@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 from typing import Tuple
 import ensembles as ensembles
+from time import time
 
 from schemes import Configuration
 
@@ -50,10 +51,13 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
         'y_val': y_test
     } if trace else {}
 
+    time_start = time()
     try:
         history = model.fit(X_train, y_train, **history_obj)
     except:
         raise HTTPException(status_code=500, detail='Ошибка в обучении модели')
+    time_stop = time()
+
     mse, mae, r2, mape = model.make_metrics(X_test, y_test)
 
     response = {
@@ -62,6 +66,7 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
         'mae': mae,
         'r2': r2,
         'mape': mape,
+        'time': time_stop - time_start,
         'history': history if trace else None
     }
     return response
@@ -86,10 +91,13 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
         'y_val': y_test
     } if trace else {}
 
+    time_start = time()
     try:
         history = model.fit(X_train, y_train, **history_obj)
     except:
         raise HTTPException(status_code=500, detail='Ошибка в обучении модели')
+    time_stop = time()
+
     mse, mae, r2, mape = model.make_metrics(X_test, y_test)
 
     response = {
@@ -98,6 +106,7 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
         'mae': mae,
         'r2': r2,
         'mape': mape,
+        'time': time_stop - time_start,
         'history': history if trace else None
     }
     return response

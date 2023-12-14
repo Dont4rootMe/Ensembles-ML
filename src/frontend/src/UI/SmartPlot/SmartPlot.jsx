@@ -3,6 +3,7 @@ import { Tabs, Tab } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 
 const SmartPlot = ({ data }) => {
+    console.log(data)
     return (
         <Tabs
             defaultActiveKey="hider"
@@ -19,11 +20,19 @@ const SmartPlot = ({ data }) => {
                         <Plot
                             layout={{ width: '100%', title: `Метрика ${key}` }}
                             data={[{
-                                x: [...Array(data[key].length).keys()],
-                                y: data[key],
+                                x: [...Array(data[key]['train'].length).keys()],
+                                y: data[key]['train'],
+                                type: 'scatter',
+                                mode: 'lines+markers',
+                                marker: { color: 'blue' },
+                                name: 'train-metric'
+                            }, {
+                                x: [...Array(data[key]['test'].length).keys()],
+                                y: data[key]['test'],
                                 type: 'scatter',
                                 mode: 'lines+markers',
                                 marker: { color: 'red' },
+                                name: 'test-metric'
                             }]}
                         />
                     </Tab>
