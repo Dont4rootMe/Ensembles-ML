@@ -58,11 +58,11 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
         raise HTTPException(status_code=500, detail='Ошибка в обучении модели')
     time_stop = time()
 
-    mse, mae, r2, mape = model.make_metrics(X_test, y_test)
+    rmse, mae, r2, mape = model.make_metrics(X_test, y_test)
 
     response = {
         'model': 'Random forest',
-        'mse': mse,
+        'rmse': rmse,
         'mae': mae,
         'r2': r2,
         'mape': mape,
@@ -98,11 +98,11 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
         raise HTTPException(status_code=500, detail='Ошибка в обучении модели')
     time_stop = time()
 
-    mse, mae, r2, mape = model.make_metrics(X_test, y_test)
+    rmse, mae, r2, mape = model.make_metrics(X_test, y_test)
 
     response = {
         'model': 'Gradient Boosting',
-        'mse': mse,
+        'rmse': rmse,
         'mae': mae,
         'r2': r2,
         'mape': mape,

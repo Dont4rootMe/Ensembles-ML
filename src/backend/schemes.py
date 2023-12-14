@@ -8,14 +8,14 @@ class ModelTrainResponse(BaseModel):
         class _train_test_list(BaseModel):
             train: List[float]
             test: List[float]
-        mse: _train_test_list
+        rmse: _train_test_list
         mae: _train_test_list
         r2: _train_test_list
         mape: _train_test_list
 
     history: _ModelHistory | None
     model: str
-    mse: float
+    rmse: float
     mae: float
     r2: float
     mape: float
