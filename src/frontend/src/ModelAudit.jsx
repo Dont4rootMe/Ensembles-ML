@@ -12,7 +12,7 @@ const ModelAudit = ({ modelHistoryLine, deleteHistory }) => {
                 position: 'absolute', overflowY: 'auto', height: '78%', top: '11%'
             }}>
                 {
-                    modelHistoryLine && modelHistoryLine.slice(0).reverse().map(plate => <ModelHistory plate={plate} deleteHistory={deleteHistory} />)
+                    modelHistoryLine && modelHistoryLine.slice(0).reverse().map(plate => !plate.dontShow && <ModelHistory key={plate.key} plate={plate} deleteHistory={deleteHistory} />)
                 }
             </div>
         </div>

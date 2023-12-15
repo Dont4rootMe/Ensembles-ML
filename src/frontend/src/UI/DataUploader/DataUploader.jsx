@@ -61,7 +61,7 @@ const DataUploader = ({ config, addHistory }) => {
             return
         }
 
-        addMessage('Обучение модели', 'Обучение модели учпешно началось')
+        addMessage('Обучение модели', 'Обучение модели уcпешно началось')
 
         let history = {
             dataset: 'dataset',

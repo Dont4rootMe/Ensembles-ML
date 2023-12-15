@@ -29,7 +29,7 @@ const ModelHistory = ({ plate, deleteHistory }) => {
             var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reply.data));
             var dlAnchorElem = document.getElementById('downloadAnchorElem');
             dlAnchorElem.setAttribute("href", dataStr);
-            dlAnchorElem.setAttribute("download", `predictions_model{plate.key}.json`);
+            dlAnchorElem.setAttribute("download", `predictions_model${plate.key + 1}.json`);
             dlAnchorElem.click();
         }
     }
@@ -44,7 +44,7 @@ const ModelHistory = ({ plate, deleteHistory }) => {
             var blob = new Blob([reply.data], { type: '' });
             var link = document.createElement('a');
             link.href = window.URL.createObjectURL(blob);
-            var fileName = `model_${plate.key}.db`;
+            var fileName = `model_${plate.key + 1}.db`;
             link.download = fileName;
             link.click();
         }
@@ -54,12 +54,12 @@ const ModelHistory = ({ plate, deleteHistory }) => {
         <Card key={plate.key} style={{ marginBottom: '5px' }}>
             <Card.Header as="h5" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div style={{ display: 'flex' }}>
-                    <Badge bg="primary">{`model №${plate.key + 1}`}</Badge>
+                    <Badge bg={plate.history.dataset === 'dataset' ? 'primary' : 'secondary'}>{`model №${plate.key + 1}`}</Badge>
                     <span style={{ marginLeft: '5px' }}>{plate.history.model}</span>
                     {plate.history.dataset === 'dataset' ? <small style={{ marginLeft: '0.8em' }}>
                         {`target: ${plate.history.target}`}</small> : ''}
                 </div>
-                <CloseButton onClick={() => deleteHistory(plate.key)} />
+                <CloseButton onClick={() => deleteHistory(plate)} />
             </Card.Header>
 
             {plate.history.trace && <SmartPlot data={plate.history.history} />}
