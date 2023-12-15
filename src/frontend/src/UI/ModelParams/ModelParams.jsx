@@ -51,7 +51,6 @@ const ModelParams = ({ modelType, config }) => {
             config.randomState = randomState === '' ? null : randomState
             config.learningRate = modelType === 'grad-boosting' ? learningRate : null
         }
-        console.log(config.bootstrapCoef)
 
     }, [config, estimators, depth, useMaxDepth, fetSubsample, useRandomSplit, bootstrapCoef, useBootstraping, randomState, learningRate])
 

@@ -112,7 +112,7 @@ def predict_model(model_number: int, predict: UploadFile):
 
 @app.get('/download-model/{model_number}')
 def download_model(model_number: int):
-    return FileResponse(f'./src/backend/local_model_storage/model_serialization_{model_number}.db')
+    return FileResponse(f'./local_model_storage/model_serialization_{model_number}.db')
 
 
 @app.get('/delete-all-models')
