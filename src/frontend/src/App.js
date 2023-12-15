@@ -6,15 +6,19 @@ import ToastList from './ToastFactory';
 import { addDanger } from './ToastFactory';
 import ModelSettings from './ModelSettings'
 import ModelAudit from './ModelAudit';
+import { call_get } from './CALLBACKS';
 
 
 function App() {
-  const [historyOffTop, setHistoryOffTop] = useState(0)
+  useEffect(() => {
+    window.addEventListener("beforeunload", call_get('http://localhost:8000/delete-all-models'));
+  }, [])
+
   const [modelHistoryLine, setModelHistoryLine] = useState([])
 
-  const addHistory = (history) => {
-    setModelHistoryLine([{ 'key': historyOffTop, 'history': history }, ...modelHistoryLine])
-    setHistoryOffTop(historyOffTop + 1)
+  const addHistory = (key, history) => {
+    console.log(key)
+    setModelHistoryLine([{ 'key': key, 'history': history }, ...modelHistoryLine])
   }
 
   const deleteHistory = (key) => {

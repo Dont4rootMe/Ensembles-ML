@@ -15,6 +15,7 @@ pydentic = "*"
 pydantic = "*"
 python-multipart = "*"
 matplotlib = "*"
+pickle = "*"
 
 [dev-packages]
 ipykernel = "*"

@@ -11,6 +11,7 @@ class ModelTrainResponse(BaseModel):
         mape: List[float]
 
     history: _ModelHistory | None
+    number: int
     model: str
     mse: float
     mae: float

@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI, UploadFile, Depends
+from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from settings import BACKEND_URL
 from fastapi.exceptions import HTTPException
@@ -91,9 +92,19 @@ async def train_on_specified_data(
     )
 
     if config.model == 'random-forest':
-        return engine.train_random_forest(X_train, X_test, y_train, y_test, config, trace)
+        return engine.train_random_forest(X_train, X_test, y_train, y_test, config, trace, return_model=True)
     if config.model == 'grad-boosting':
-        return engine.train_grad_boost(X_train, X_test, y_train, y_test, config, trace)
+        return engine.train_grad_boost(X_train, X_test, y_train, y_test, config, trace, return_model=True)
+
+
+@app.get('/delete-all-models')
+def delete_all_models():
+    engine.delete_models()
+
+
+@app.get('/delete-model/{number}')
+def delete_model(number: int):
+    engine.delete_model(number)
 
 
 if __name__ == '__main__':

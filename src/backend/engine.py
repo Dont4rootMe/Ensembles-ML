@@ -1,10 +1,13 @@
 from sklearn.datasets import make_regression
 from sklearn.model_selection import train_test_split
 from fastapi.exceptions import HTTPException
+import settings
 import pandas as pd
 import numpy as np
 from typing import Tuple
 import ensembles as ensembles
+import pickle
+import os
 
 from schemes import Configuration
 
@@ -32,7 +35,7 @@ def proccess_file(file):
     return pd.read_csv(file.file)
 
 
-def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration, trace: bool):
+def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration, trace: bool, return_model: bool = False):
     try:
         model: ensembles.RandomForestMSE = ensembles.RandomForestMSE(
             n_estimators=config.estimators,
@@ -56,7 +59,15 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
         raise HTTPException(status_code=500, detail='Ошибка в обучении модели')
     mse, mae, r2, mape = model.make_metrics(X_test, y_test)
 
+    print(type(model))
+
+    if return_model:
+        with open(
+                f'./src/backend/local_model_storage/model_serialization_{settings.MODEL_NUMBER}.db', 'wb') as f:
+            pickle.dump(model, f)
+
     response = {
+        'number': settings.MODEL_NUMBER,
         'model': 'Random forest',
         'mse': mse,
         'mae': mae,
@@ -64,10 +75,13 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
         'mape': mape,
         'history': history if trace else None
     }
+
+    settings.INC_MODEL_NUMBER()
+
     return response
 
 
-def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, trace: bool):
+def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, trace: bool, return_model: bool = False):
     try:
         model: ensembles.GradientBoostingMSE = ensembles.GradientBoostingMSE(
             n_estimators=config.estimators,
@@ -92,7 +106,14 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
         raise HTTPException(status_code=500, detail='Ошибка в обучении модели')
     mse, mae, r2, mape = model.make_metrics(X_test, y_test)
 
+    if return_model:
+        print('inside')
+        with open(
+                f'./src/backend/local_model_storage/model_serialization_{settings.MODEL_NUMBER}.db', 'wb') as f:
+            pickle.dump(model, f)
+
     response = {
+        'number': settings.MODEL_NUMBER,
         'model': 'Gradient Boosting',
         'mse': mse,
         'mae': mae,
@@ -100,4 +121,24 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
         'mape': mape,
         'history': history if trace else None
     }
+
+    settings.INC_MODEL_NUMBER()
+
     return response
+
+
+def delete_model(model: int):
+    try:
+        os.remove(
+            f'./src/backend/local_model_storage/model_serialization_{model}.db')
+    except OSError:
+        pass
+
+
+def delete_models():
+    for i in range(settings.MODEL_NUMBER):
+        try:
+            os.remove(
+                f'./src/backend/local_model_storage/model_serialization_{i}.db')
+        except OSError:
+            pass
