@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from typing import Tuple
 import ensembles as ensembles
+from time import time
 import pickle
 import os
 
@@ -53,13 +54,13 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
         'y_val': y_test
     } if trace else {}
 
+    time_start = time()
     try:
         history = model.fit(X_train, y_train, **history_obj)
     except:
         raise HTTPException(status_code=500, detail='Ошибка в обучении модели')
-    mse, mae, r2, mape = model.make_metrics(X_test, y_test)
-
-    print(type(model))
+    time_stop = time()
+    rmse, mae, r2, mape = model.make_metrics(X_test, y_test)
 
     if return_model:
         with open(
@@ -69,10 +70,11 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
     response = {
         'number': settings.MODEL_NUMBER,
         'model': 'Random forest',
-        'mse': mse,
+        'rmse': rmse,
         'mae': mae,
         'r2': r2,
         'mape': mape,
+        'time': time_stop - time_start,
         'history': history if trace else None
     }
 
@@ -100,11 +102,14 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
         'y_val': y_test
     } if trace else {}
 
+    time_start = time()
     try:
         history = model.fit(X_train, y_train, **history_obj)
     except:
         raise HTTPException(status_code=500, detail='Ошибка в обучении модели')
-    mse, mae, r2, mape = model.make_metrics(X_test, y_test)
+    time_stop = time()
+
+    rmse, mae, r2, mape = model.make_metrics(X_test, y_test)
 
     if return_model:
         print('inside')
@@ -115,10 +120,11 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
     response = {
         'number': settings.MODEL_NUMBER,
         'model': 'Gradient Boosting',
-        'mse': mse,
+        'rmse': rmse,
         'mae': mae,
         'r2': r2,
         'mape': mape,
+        'time': time_stop - time_start,
         'history': history if trace else None
     }
 
