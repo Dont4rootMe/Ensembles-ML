@@ -3,7 +3,6 @@ import { Tabs, Tab } from 'react-bootstrap';
 import Plot from 'react-plotly.js';
 
 const SmartPlot = ({ data }) => {
-    console.log(data)
     return (
         <Tabs
             defaultActiveKey="hider"
@@ -16,7 +15,7 @@ const SmartPlot = ({ data }) => {
             </Tab>
             {
                 Object.keys(data).map(key =>
-                    <Tab eventKey={key} title={key}>
+                    <Tab eventKey={key} key={Math.floor(Math.random() * 100000)} title={key}>
                         <Plot
                             layout={{ width: '100%', title: `Метрика ${key}` }}
                             data={[{

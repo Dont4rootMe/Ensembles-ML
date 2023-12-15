@@ -15,7 +15,7 @@ const ModelParams = ({ modelType, config }) => {
 
     const [useRandomSplit, setUseRandomSplit] = useState(false)
 
-    const [bootstrapCoef, setBootstrapCoef] = useState(null)
+    const [bootstrapCoef, setBootstrapCoef] = useState('')
     const [useBootstraping, setUseBootstraping] = useState(false)
 
     const [randomState, setRandomState] = useState('42')
@@ -45,10 +45,13 @@ const ModelParams = ({ modelType, config }) => {
             config.depth = useMaxDepth ? depth : null
             config.fetSubsample = fetSubsample === '' ? 1 / 3 : fetSubsample
             config.useRandomSplit = useRandomSplit
-            config.bootstrapCoef = useBootstraping ? (bootstrapCoef instanceof Number ? Number(bootstrapCoef) : parseFloat(bootstrapCoef)) : null
+            config.bootstrapCoef = useBootstraping ? ((Number(bootstrapCoef) < 1) && (Number(bootstrapCoef) > 0)
+                ? Number(bootstrapCoef) : bootstrapCoef === '' ? 0.7 : parseFloat(bootstrapCoef))
+                : null
             config.randomState = randomState === '' ? null : randomState
             config.learningRate = modelType === 'grad-boosting' ? learningRate : null
         }
+
     }, [config, estimators, depth, useMaxDepth, fetSubsample, useRandomSplit, bootstrapCoef, useBootstraping, randomState, learningRate])
 
     useEffect(() => {

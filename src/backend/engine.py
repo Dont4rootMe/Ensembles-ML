@@ -64,7 +64,7 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
 
     if return_model:
         with open(
-                f'./src/backend/local_model_storage/model_serialization_{settings.MODEL_NUMBER}.db', 'wb') as f:
+                f'./local_model_storage/model_serialization_{settings.MODEL_NUMBER}.db', 'wb') as f:
             pickle.dump(model, f)
 
     response = {
@@ -114,7 +114,7 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
     if return_model:
         print('inside')
         with open(
-                f'./src/backend/local_model_storage/model_serialization_{settings.MODEL_NUMBER}.db', 'wb') as f:
+                f'./local_model_storage/model_serialization_{settings.MODEL_NUMBER}.db', 'wb') as f:
             pickle.dump(model, f)
 
     response = {
@@ -136,7 +136,7 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
 def predict(model_number: int, dataset: pd.DataFrame) -> np.array:
     try:
         model = pickle.load(open(
-            f'./src/backend/local_model_storage/model_serialization_{model_number}.db', 'rb'))
+            f'./local_model_storage/model_serialization_{model_number}.db', 'rb'))
     except:
         raise HTTPException(
             status_code=500, detail='Не удалось восстановить модель')
@@ -151,7 +151,7 @@ def predict(model_number: int, dataset: pd.DataFrame) -> np.array:
 def delete_model(model: int):
     try:
         os.remove(
-            f'./src/backend/local_model_storage/model_serialization_{model}.db')
+            f'./local_model_storage/model_serialization_{model}.db')
     except OSError:
         pass
 
@@ -160,7 +160,7 @@ def delete_models():
     for i in range(settings.MODEL_NUMBER):
         try:
             os.remove(
-                f'./src/backend/local_model_storage/model_serialization_{i}.db')
+                f'./local_model_storage/model_serialization_{i}.db')
         except OSError:
             pass
     settings.RESET_MODEL_NUMBER()

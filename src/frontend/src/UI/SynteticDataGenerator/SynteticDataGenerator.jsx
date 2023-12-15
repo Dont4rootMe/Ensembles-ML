@@ -28,8 +28,12 @@ const SynteticDataGenerator = ({ config, addHistory }) => {
             addDanger('Learning rate', 'Задайте явным образом learning rate')
             return
         }
+        if (config.bootstrapCoef == 0) {
+            addDanger('Bootstrap coeficient', 'Коэффициент бутстрапа не может быть равным нулю')
+            return
+        }
 
-        addMessage('Обучение модели', 'Обучение модели учпешно началось')
+        addMessage('Обучение модели', 'Обучение модели уcпешно началось')
 
         let history = {
             dataset: 'synt',

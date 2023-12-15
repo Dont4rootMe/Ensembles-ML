@@ -8,32 +8,24 @@ import ModelSettings from './ModelSettings'
 import ModelAudit from './ModelAudit';
 import { call_get } from './CALLBACKS';
 
-
 function App() {
-  const [, forceUpdate] = useState({})
-
   useEffect(() => {
     window.addEventListener("beforeunload", call_get('http://localhost:8000/delete-all-models'));
   }, [])
 
+  const [blacklist, setBlackList] = useState([])
+  const [, forceUpdate] = useState({})
   const [modelHistoryLine, setModelHistoryLine] = useState([])
 
   const addHistory = (key, history) => {
-
     modelHistoryLine.push({ 'key': key, 'history': history })
     forceUpdate({})
   }
 
-  const deleteHistory = (key) => {
-    call_get(`http://localhost:8000/delete-model/${key}`)
-    let temp = []
-    for (const hist of modelHistoryLine) {
-      if (hist.key !== key) {
-        temp.push(hist)
-      }
-    }
-
-    setModelHistoryLine(temp)
+  const deleteHistory = (plate) => {
+    call_get(`http://localhost:8000/delete-model/${plate.key}`)
+    plate.dontShow = true
+    forceUpdate({})
   }
 
 
@@ -43,7 +35,7 @@ function App() {
       <a id="downloadAnchorElem" style={{ display: 'none' }}></a>
       <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '3fr 7fr' }}>
         <ModelSettings addHistory={addHistory} />
-        <ModelAudit modelHistoryLine={modelHistoryLine} deleteHistory={deleteHistory} />
+        <ModelAudit modelHistoryLine={modelHistoryLine} deleteHistory={deleteHistory} blacklist={blacklist} />
       </div>
     </div>
   );

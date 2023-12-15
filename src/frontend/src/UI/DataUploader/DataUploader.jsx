@@ -60,8 +60,12 @@ const DataUploader = ({ config, addHistory }) => {
             addDanger('Число деревьев', 'Задайте явным образом параметр модели')
             return
         }
+        if (config.bootstrapCoef == 0) {
+            addDanger('Bootstrap coeficient', 'Коэффициент бутстрапа не может быть равным нулю')
+            return
+        }
 
-        addMessage('Обучение модели', 'Обучение модели учпешно началось')
+        addMessage('Обучение модели', 'Обучение модели уcпешно началось')
 
         let history = {
             dataset: 'dataset',
