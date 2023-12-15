@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Card, Button, Badge, CloseButton, InputGroup, Form } from 'react-bootstrap';
 import SmartPlot from '../SmartPlot/SmartPlot';
-import { addWarning } from '../../ToastFactory';
-import { call_post } from '../../CALLBACKS';
+import { addWarning, addDanger, addSuccess } from '../../ToastFactory';
+import { call_post, call_get, BadResponse } from '../../CALLBACKS';
 
 const ModelHistory = ({ plate, deleteHistory }) => {
 
@@ -21,15 +21,34 @@ const ModelHistory = ({ plate, deleteHistory }) => {
         const formData = new FormData();
         formData.append("predict", predictionSet);
         const reply = await call_post(`http://localhost:8000/predict-model/${plate.key}`, formData)
-        console.log(reply)
-        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reply.data));
-        var dlAnchorElem = document.getElementById('downloadAnchorElem');
-        dlAnchorElem.setAttribute("href", dataStr);
-        dlAnchorElem.setAttribute("download", `predictions_model{plate.key}.json`);
-        dlAnchorElem.click();
+        if (reply instanceof BadResponse) {
+            addDanger('Что-то пошло не так', `Detail: ${reply.detail}`)
+        } else {
+            addSuccess('Предсказание модели', 'Файл успешно скачивается')
+
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reply.data));
+            var dlAnchorElem = document.getElementById('downloadAnchorElem');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `predictions_model{plate.key}.json`);
+            dlAnchorElem.click();
+        }
     }
 
-    console.log(plate)
+    const downloadModel = async () => {
+        const reply = await call_get(`http://localhost:8000/download-model/${plate.key}`)
+        if (reply instanceof BadResponse) {
+            addDanger('Что-то пошло не так', `Detail: ${reply.detail}`)
+        } else {
+            addSuccess('Скачивание модели', 'Файл модели успешно скачивается')
+
+            var blob = new Blob([reply.data], { type: '' });
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            var fileName = `model_${plate.key}.db`;
+            link.download = fileName;
+            link.click();
+        }
+    }
 
     return (
         <Card key={plate.key} style={{ marginBottom: '5px' }}>
@@ -97,7 +116,9 @@ const ModelHistory = ({ plate, deleteHistory }) => {
             {
                 plate.history.dataset === 'dataset' &&
                 <Card.Footer style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Button variant="primary" style={{ marginRight: '1em' }}>Скачать модель</Button>
+                    <Button variant="primary" style={{ marginRight: '1em' }}
+                        onClick={() => downloadModel()}
+                    >Скачать модель</Button>
                     {
                         !showPrediction ? <Button variant="secondary" onClick={() => setShowPrediction(true)}>Предсказать</Button> :
                             <InputGroup style={{ width: '60%' }}>
