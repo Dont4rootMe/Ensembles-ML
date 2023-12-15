@@ -14,6 +14,7 @@ class ModelTrainResponse(BaseModel):
         mape: _train_test_list
 
     history: _ModelHistory | None
+    number: int
     model: str
     rmse: float
     mae: float

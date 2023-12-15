@@ -1,10 +1,53 @@
 import React, { useState } from 'react';
-import { Card, Button, Badge, CloseButton } from 'react-bootstrap';
+import { Card, Button, Badge, CloseButton, InputGroup, Form } from 'react-bootstrap';
 import SmartPlot from '../SmartPlot/SmartPlot';
+import { addWarning, addDanger, addSuccess } from '../../ToastFactory';
+import { call_post, call_get, BadResponse } from '../../CALLBACKS';
 
 const ModelHistory = ({ plate, deleteHistory }) => {
+
+    const [showPrediction, setShowPrediction] = useState(false)
+    const [predictionSet, setPredictionSet] = useState(null)
+
     const getFloatPrecision = (float, precision = 4) => {
         return (float.toFixed(precision))
+    }
+
+    const predictModel = async () => {
+        if (!predictionSet) {
+            addWarning('Предсказание данных', 'Укажите данные')
+            return;
+        }
+        const formData = new FormData();
+        formData.append("predict", predictionSet);
+        const reply = await call_post(`http://localhost:8000/predict-model/${plate.key}`, formData)
+        if (reply instanceof BadResponse) {
+            addDanger('Что-то пошло не так', `Detail: ${reply.detail}`)
+        } else {
+            addSuccess('Предсказание модели', 'Файл успешно скачивается')
+
+            var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reply.data));
+            var dlAnchorElem = document.getElementById('downloadAnchorElem');
+            dlAnchorElem.setAttribute("href", dataStr);
+            dlAnchorElem.setAttribute("download", `predictions_model{plate.key}.json`);
+            dlAnchorElem.click();
+        }
+    }
+
+    const downloadModel = async () => {
+        const reply = await call_get(`http://localhost:8000/download-model/${plate.key}`)
+        if (reply instanceof BadResponse) {
+            addDanger('Что-то пошло не так', `Detail: ${reply.detail}`)
+        } else {
+            addSuccess('Скачивание модели', 'Файл модели успешно скачивается')
+
+            var blob = new Blob([reply.data], { type: '' });
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            var fileName = `model_${plate.key}.db`;
+            link.download = fileName;
+            link.click();
+        }
     }
 
     return (
@@ -70,6 +113,34 @@ const ModelHistory = ({ plate, deleteHistory }) => {
                     {plate.history.r2 && (`Время обучения: ${getFloatPrecision(plate.history.time)} c.`)}
                 </Card.Text>
             </Card.Body>
+            {
+                plate.history.dataset === 'dataset' &&
+                <Card.Footer style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Button variant="primary" style={{ marginRight: '1em' }}
+                        onClick={() => downloadModel()}
+                    >Скачать модель</Button>
+                    {
+                        !showPrediction ? <Button variant="secondary" onClick={() => setShowPrediction(true)}>Предсказать</Button> :
+                            <InputGroup style={{ width: '60%' }}>
+                                <Form.Control
+                                    type="file"
+                                    placeholder="Файл для предсказания"
+                                    onChange={(e) => setPredictionSet(e.target.files[0])}
+                                />
+                                <Button variant="outline-secondary"
+                                    onClick={() => predictModel()}
+                                >
+                                    Начать
+                                </Button>
+                                <Button variant="outline-secondary" id="cancel-btn"
+                                    onClick={() => { setShowPrediction(false); setPredictionSet(null) }}>
+                                    Выйти
+                                </Button>
+                            </InputGroup>
+
+                    }
+                </Card.Footer>
+            }
         </Card>
     )
 }

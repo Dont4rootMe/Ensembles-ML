@@ -89,7 +89,7 @@ const DataUploader = ({ config, addHistory }) => {
             addDanger('Что-то пошло не так', `Detail: ${reply.detail}`)
         } else {
             addSuccess('Обучение модели', 'Модель обучилась успешно')
-            addHistory({ ...history, ...reply.data })
+            addHistory(reply.data.number, { ...history, ...reply.data })
         }
     }
 

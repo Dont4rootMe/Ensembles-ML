@@ -45,7 +45,7 @@ const SynteticDataGenerator = ({ config, addHistory }) => {
             addDanger('Обучение модели', 'Что-то пошло не так')
         } else {
             addSuccess('Обучение модели', 'Модель обучилась успешно')
-            addHistory({ ...history, ...reply.data })
+            addHistory(reply.data.number, { ...history, ...reply.data })
         }
     }
 
