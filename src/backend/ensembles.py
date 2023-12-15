@@ -255,7 +255,7 @@ class GradientBoostingMSE:
             }
 
         # initialize first target for boosting
-        grad = y
+        grad = y.copy()
         for _ in range(self.n_estimators):
             idx = np.random.permutation(
                 X.shape[0])[:bootstrap] if bootstrap is not None else np.arange(X.shape[0])
