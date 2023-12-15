@@ -10,6 +10,8 @@ import { call_get } from './CALLBACKS';
 
 
 function App() {
+  const [, forceUpdate] = useState({})
+
   useEffect(() => {
     window.addEventListener("beforeunload", call_get('http://localhost:8000/delete-all-models'));
   }, [])
@@ -17,11 +19,13 @@ function App() {
   const [modelHistoryLine, setModelHistoryLine] = useState([])
 
   const addHistory = (key, history) => {
-    console.log(key)
-    setModelHistoryLine([{ 'key': key, 'history': history }, ...modelHistoryLine])
+
+    modelHistoryLine.push({ 'key': key, 'history': history })
+    forceUpdate({})
   }
 
   const deleteHistory = (key) => {
+    call_get(`http://localhost:8000/delete-model/${key}`)
     let temp = []
     for (const hist of modelHistoryLine) {
       if (hist.key !== key) {

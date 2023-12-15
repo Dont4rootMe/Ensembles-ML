@@ -1,11 +1,30 @@
 import React, { useState } from 'react';
-import { Card, Button, Badge, CloseButton } from 'react-bootstrap';
+import { Card, Button, Badge, CloseButton, InputGroup, Form } from 'react-bootstrap';
 import SmartPlot from '../SmartPlot/SmartPlot';
+import { addWarning } from '../../ToastFactory';
+import { call_post } from '../../CALLBACKS';
 
 const ModelHistory = ({ plate, deleteHistory }) => {
+
+    const [showPrediction, setShowPrediction] = useState(false)
+    const [predictionSet, setPredictionSet] = useState(null)
+
     const getFloatPrecision = (float, precision = 4) => {
         return (float.toFixed(precision))
     }
+
+    const predictModel = async () => {
+        if (!predictionSet) {
+            addWarning('Предсказание данных', 'Укажите данные')
+            return;
+        }
+        const formData = new FormData();
+        formData.append("predict", predictionSet);
+        const reply = await call_post('http://localhost:8000/dataset-train', formData)
+
+    }
+
+    console.log(plate)
 
     return (
         <Card key={plate.key} style={{ marginBottom: '5px' }}>
@@ -67,6 +86,32 @@ const ModelHistory = ({ plate, deleteHistory }) => {
                     {plate.history.r2 && (`R^2: ${getFloatPrecision(plate.history.r2)}`)}
                 </Card.Text>
             </Card.Body>
+            {
+                plate.history.dataset === 'dataset' &&
+                <Card.Footer style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Button variant="primary" style={{ marginRight: '1em' }}>Скачать модель</Button>
+                    {
+                        !showPrediction ? <Button variant="secondary" onClick={() => setShowPrediction(true)}>Предсказать</Button> :
+                            <InputGroup style={{ width: '60%' }}>
+                                <Form.Control
+                                    type="file"
+                                    placeholder="Файл для предсказания"
+                                    onChange={(e) => setPredictionSet(e.target.files[0])}
+                                />
+                                <Button variant="outline-secondary"
+                                    onClick={() => predictModel()}
+                                >
+                                    Начать
+                                </Button>
+                                <Button variant="outline-secondary" id="cancel-btn"
+                                    onClick={() => setShowPrediction(false)}>
+                                    Выйти
+                                </Button>
+                            </InputGroup>
+
+                    }
+                </Card.Footer>
+            }
         </Card>
     )
 }

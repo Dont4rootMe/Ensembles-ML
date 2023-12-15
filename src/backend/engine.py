@@ -142,3 +142,4 @@ def delete_models():
                 f'./src/backend/local_model_storage/model_serialization_{i}.db')
         except OSError:
             pass
+    settings.RESET_MODEL_NUMBER()

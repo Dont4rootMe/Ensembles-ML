@@ -97,6 +97,11 @@ async def train_on_specified_data(
         return engine.train_grad_boost(X_train, X_test, y_train, y_test, config, trace, return_model=True)
 
 
+@app.post('/predict-model')
+def predict_model(model_number: int, predict: UploadFile):
+    print(engine.proccess_file(predict))
+
+
 @app.get('/delete-all-models')
 def delete_all_models():
     engine.delete_models()
