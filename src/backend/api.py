@@ -31,6 +31,10 @@ async def train_on_syntetic_dataset(config: schemes.ConfigurationSyntet, trace: 
                                                                     config.synt_prefs.feature_size,
                                                                     config.synt_prefs.validation_percent,
                                                                     config.randomState)
+    print(config)
+    import settings
+    print(settings.MODEL_NUMBER)
+
     if config.model == 'random-forest':
         return engine.train_random_forest(X_train, X_test, y_train, y_test, config, trace)
     if config.model == 'grad-boosting':
