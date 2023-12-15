@@ -133,6 +133,21 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
     return response
 
 
+def predict(model_number: int, dataset: pd.DataFrame) -> np.array:
+    try:
+        model = pickle.load(open(
+            f'./src/backend/local_model_storage/model_serialization_{model_number}.db', 'rb'))
+    except:
+        raise HTTPException(
+            status_code=500, detail='Не удалось восстановить модель')
+
+    try:
+        return model.predict(dataset)
+    except:
+        raise HTTPException(
+            status_code=500, detail='Форма датасета не такая же как при обучении')
+
+
 def delete_model(model: int):
     try:
         os.remove(

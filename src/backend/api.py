@@ -4,6 +4,7 @@ from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from settings import BACKEND_URL
 from fastapi.exceptions import HTTPException
+import json
 
 import schemes
 import engine
@@ -97,9 +98,12 @@ async def train_on_specified_data(
         return engine.train_grad_boost(X_train, X_test, y_train, y_test, config, trace, return_model=True)
 
 
-@app.post('/predict-model')
+@app.post('/predict-model/{model_number}')
 def predict_model(model_number: int, predict: UploadFile):
-    print(engine.proccess_file(predict))
+    dataset = engine.proccess_file(predict)
+    preds = engine.predict(model_number, dataset)
+
+    return json.dumps(preds.tolist())
 
 
 @app.get('/delete-all-models')

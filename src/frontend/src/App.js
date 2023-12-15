@@ -40,6 +40,7 @@ function App() {
   return (
     <div style={{ height: '100%', width: '100%', paddingTop: '3%', paddingLeft: '7%', paddingRight: '7%', columnGap: '10px' }}>
       <ToastList />
+      <a id="downloadAnchorElem" style={{ display: 'none' }}></a>
       <div style={{ width: '100%', display: 'grid', gridTemplateColumns: '3fr 7fr' }}>
         <ModelSettings addHistory={addHistory} />
         <ModelAudit modelHistoryLine={modelHistoryLine} deleteHistory={deleteHistory} />

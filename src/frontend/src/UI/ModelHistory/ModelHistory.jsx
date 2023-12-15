@@ -20,8 +20,13 @@ const ModelHistory = ({ plate, deleteHistory }) => {
         }
         const formData = new FormData();
         formData.append("predict", predictionSet);
-        const reply = await call_post('http://localhost:8000/dataset-train', formData)
-
+        const reply = await call_post(`http://localhost:8000/predict-model/${plate.key}`, formData)
+        console.log(reply)
+        var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reply.data));
+        var dlAnchorElem = document.getElementById('downloadAnchorElem');
+        dlAnchorElem.setAttribute("href", dataStr);
+        dlAnchorElem.setAttribute("download", `predictions_model{plate.key}.json`);
+        dlAnchorElem.click();
     }
 
     console.log(plate)
@@ -107,7 +112,7 @@ const ModelHistory = ({ plate, deleteHistory }) => {
                                     Начать
                                 </Button>
                                 <Button variant="outline-secondary" id="cancel-btn"
-                                    onClick={() => setShowPrediction(false)}>
+                                    onClick={() => { setShowPrediction(false); setPredictionSet(null) }}>
                                     Выйти
                                 </Button>
                             </InputGroup>
