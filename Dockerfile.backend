@@ -4,6 +4,7 @@ WORKDIR /app
 COPY ./Pipfile ./Pipfile.lock ./
 RUN pipenv install
 COPY ./src/backend ./
+RUN mkdir ./local_model_storage
 
 EXPOSE 8000
 CMD ["pipenv", "run", "python3", "api.py"]
