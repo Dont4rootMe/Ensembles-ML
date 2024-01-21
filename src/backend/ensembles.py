@@ -16,28 +16,54 @@ warnings.warn = warn
 
 
 class RandomForestMSE:
+    """
+        Methods
+        -------
+        fit(X, y, X_val=None, y_val=None)
+            Fit the random forest model to the training data.
+
+        make_metrics(X, y)
+            Calculate evaluation metrics for the model predictions.
+
+        predict(X)
+            Predict the target variable for the input data.
+    """
+
     def __init__(
         self, n_estimators, *, max_depth=None, feature_subsample_size=None,
         splitter='best', bootstrap=None, random_state=42, **trees_parameters
     ):
         """
+        Random Forest for Mean Squared Error (MSE) regression.
+
+        Parameters
+        ----------
         n_estimators : int
             The number of trees in the forest.
 
-        max_depth : int
-            The maximum depth of the tree. If None then there is no limits.
+        max_depth : int, optional
+            The maximum depth of the tree. If None, then there is no limit.
 
-        feature_subsample_size : float
-            The size of feature set for each tree. If None then use one-third of all features.
+        feature_subsample_size : float, optional
+            The size of the feature set for each tree. If None, then use one-third of all features.
 
-        splitter: ['best', 'random']
-            Criterion for splitting nodes in in trees
+        splitter : {'best', 'random'}, default='best'
+            Criterion for splitting nodes in the trees.
 
-        bootstrap: None | int | float
-            if None bootstraping is not performed. Otherwise defines splits for bootstraping
+        bootstrap : None, int, or float, default=None
+            If None, bootstrapping is not performed. Otherwise, it defines the splits for bootstrapping.
 
-        random_state : int
-            set the random state for estimators. 42 by default
+        random_state : int, default=42
+            Set the random state for estimators.
+
+        **trees_parameters : dict
+            Additional parameters to be passed to the underlying DecisionTreeRegressor.
+
+        Raises
+        ------
+        ValueError
+            If `feature_subsample_size` is not in the valid range of values.
+
         """
         self.trees = None
 
@@ -51,28 +77,53 @@ class RandomForestMSE:
         if isinstance(feature_subsample_size, float) and \
                 (feature_subsample_size > 1.0 or feature_subsample_size < 0.0):
             raise ValueError(
-                'feature_subsample_size must be in range [0,1] or be integer')
+                'feature_subsample_size must be in range [0,1] or be an integer')
         self.fss = feature_subsample_size if feature_subsample_size is not None else 1/3
 
         self.tree_parameters = trees_parameters
 
     def fit(self, X: np.ndarray, y, X_val=None, y_val=None):
         """
+        Fit the Random Forest model to the training data.
+
+        Parameters
+        ----------
         X : numpy ndarray
-            Array of size n_objects, n_features
+            Array of size (n_objects, n_features) representing the training input samples.
 
         y : numpy ndarray
-            Array of size n_objects
+            Array of size (n_objects) representing the target values.
 
-        X_val : numpy ndarray
-            Array of size n_val_objects, n_features
+        X_val : numpy ndarray, optional
+            Array of size (n_val_objects, n_features) representing the validation input samples.
 
-        y_val : numpy ndarray
-            Array of size n_val_objects
+        y_val : numpy ndarray, optional
+            Array of size (n_val_objects) representing the validation target values.
+
+        Returns
+        -------
+        self : GradientBoostingMSE
+            The fitted RandomForestMSE object if history is not required.
+
+        history : dict
+            The history of evaluation metrics during training, if X_val and y_val are provided. Otherwise, None.
+            The dictionary has the following structure:
+            {
+                'rmse': {'train': [], 'test': []},
+                'r2': {'train': [], 'test': []},
+                'mape': {'train': [], 'test': []},
+                'mae': {'train': [], 'test': []}
+            }
+
+        Raises
+        ------
+        ValueError
+            If `X` or `y` are not numpy data structures or if `X` has fewer features than expected by `feature_subsample_size`.
+
         """
         self.trees = []
 
-        # if X or y are not numpy datastructures than redefine them
+        # if X or y are not numpy data structures, redefine them
         if isinstance(X, DataFrame):
             X = X.to_numpy()
         if isinstance(y, Series):
@@ -84,9 +135,9 @@ class RandomForestMSE:
         # check if predefined fss is less than count of features in objects
         if (isinstance(self.fss, int) and self.fss > X.shape[1]):
             raise ValueError(
-                'X have less features than expected by feature_subsample_size')
+                'X has fewer features than expected by feature_subsample_size')
 
-        # if bootstrapping is enabled check and prepare splitting point
+        # if bootstrapping is enabled, check and prepare splitting point
         bootstrap = None
         if self.bootstrap is not None:
             if (isinstance(self.bootstrap, int) and self.bootstrap > X.shape[0] or
@@ -137,6 +188,32 @@ class RandomForestMSE:
         return self if history is None else history
 
     def make_metrics(self, X, y):
+        """
+        Calculate evaluation metrics for the given input samples and target values.
+
+        Parameters
+        ----------
+        X : numpy ndarray
+            Array of size (n_objects, n_features) representing the input samples.
+
+        y : numpy ndarray
+            Array of size (n_objects) representing the target values.
+
+        Returns
+        -------
+        rmse : float
+            Root Mean Squared Error (RMSE) metric.
+
+        mae : float
+            Mean Absolute Error (MAE) metric.
+
+        r2 : float
+            R-squared (coefficient of determination) metric.
+
+        mape : float
+            Mean Absolute Percentage Error (MAPE) metric.
+
+        """
         preds = self.predict(X)
 
         rmse = mean_squared_error(y, preds, squared=False)
@@ -148,23 +225,46 @@ class RandomForestMSE:
 
     def predict(self, X):
         """
+        Predict the target values for the given input samples.
+
+        Parameters
+        ----------
         X : numpy ndarray
-            Array of size n_objects, n_features
+            Array of size (n_objects, n_features) representing the input samples.
 
         Returns
         -------
         y : numpy ndarray
-            Array of size n_objects
+            Array of size (n_objects) representing the predicted target values.
+
+        Raises
+        ------
+        ValueError
+            If the model is not fitted yet.
+
         """
-        # if model is not fitted yet raise error
+        # if model is not fitted yet, raise an error
         if self.trees is None:
-            raise ValueError('model is not fited')
+            raise ValueError('Model is not fitted')
         preds = np.array([tree.predict(X) for tree in self.trees])
 
         return np.mean(preds, axis=0)
 
 
 class GradientBoostingMSE:
+    """
+        Methods
+        -------
+        fit(X, y, X_val=None, y_val=None)
+            Fit the gradient boosting model to the training data.
+
+        make_metrics(X, y)
+            Calculate evaluation metrics for the model predictions.
+
+        predict(X)
+            Predict the target variable for the input data.
+    """
+
     def __init__(
         self, n_estimators, *, learning_rate=0.1, max_depth=5,
         splitter='best', feature_subsample_size=None, random_state=42,
@@ -172,31 +272,39 @@ class GradientBoostingMSE:
         **trees_parameters
     ):
         """
+        Gradient Boosting for Mean Squared Error (MSE) regression.
+
+        Parameters
+        ----------
         n_estimators : int
             The number of trees in the forest.
 
-        learning_rate : float
-            Use alpha * learning_rate instead of alpha
+        learning_rate : float, optional (default=0.1)
+            Learning rate shrinks the contribution of each tree.
 
-        max_depth : int
-            The maximum depth of the tree. If None then there is no limits.
+        max_depth : int, optional (default=5)
+            The maximum depth of the tree. If None, there is no limit.
 
-        feature_subsample_size : float | None
-            The size of feature set for each tree. If None then use one-third of all features.
+        splitter : {'best', 'random'}, optional (default='best')
+            The strategy used to choose the split at each node.
 
+        feature_subsample_size : float or None, optional (default=None)
+            The size of the feature set for each tree. If None, one-third of all features are used.
 
-        splitter: ['best', 'random']
-            Criterion for splitting nodes in in trees
+        bootstrap : None, int, or float, optional (default=None)
+            If None, bootstrapping is not performed. Otherwise, it defines the splits for bootstrapping.
 
+        random_state : int, optional (default=42)
+            Set the random state for estimators.
 
-        splitter: ['best', 'random']
-            Criterion for splitting nodes in in trees
+        trees_parameters : dict
+            Additional parameters to be passed to the DecisionTreeRegressor.
 
-        bootstrap: None | int | float
-            if None bootstraping is not performed. Otherwise defines splits for bootstraping
+        Raises
+        ------
+        ValueError
+            If feature_subsample_size is not in the valid range of values.
 
-        random_state : int
-            set the random state for estimators. 42 by default
         """
         self.weights = None
         self.trees = None
@@ -212,36 +320,67 @@ class GradientBoostingMSE:
         if isinstance(feature_subsample_size, float) and \
                 (feature_subsample_size > 1.0 or feature_subsample_size < 0.0):
             raise ValueError(
-                'feature_subsample_size must be in range [0,1] or be integer')
+                'feature_subsample_size must be in range [0,1] or be an integer')
         self.fss = feature_subsample_size if feature_subsample_size is not None else 1/3
         self.trees_parameters = trees_parameters
 
     def fit(self, X, y, X_val=None, y_val=None):
         """
-        X : numpy ndarray
-            Array of size n_objects, n_features
+        Fit the gradient boosting model to the training data.
 
-        y : numpy ndarray
-            Array of size n_objects
+        Parameters
+        ----------
+        X : numpy ndarray or pandas DataFrame
+            Array of size (n_objects, n_features) or DataFrame containing the input features.
+
+        y : numpy ndarray or pandas Series
+            Array of size (n_objects) or Series containing the target variable.
+
+        X_val : numpy ndarray or pandas DataFrame, optional (default=None)
+            Array of size (n_objects, n_features) or DataFrame containing the validation input features.
+
+        y_val : numpy ndarray or pandas Series, optional (default=None)
+            Array of size (n_objects) or Series containing the validation target variable.
+
+        Raises
+        ------
+        ValueError
+            If X has fewer features than expected by feature_subsample_size.
+            If bootstrap index is out of range.
+
+        Returns
+        -------
+        self : GradientBoostingMSE
+            The fitted gradient boosting model if history is not required.
+
+        history : dict or None
+            The history of evaluation metrics during training, if X_val and y_val are provided. Otherwise, None.
+            The dictionary has the following structure:
+            {
+                'rmse': {'train': [], 'test': []},
+                'r2': {'train': [], 'test': []},
+                'mape': {'train': [], 'test': []},
+                'mae': {'train': [], 'test': []}
+            }
         """
         self.weights = []
         self.trees = []
 
-        # if X or y are not numpy datastructures than redefine them
+        # if X or y are not numpy data structures, convert them
         if isinstance(X, DataFrame):
             X = X.to_numpy()
         if isinstance(y, Series):
             y = y.to_numpy()
 
-        # generator, used in trees random_state
+        # generator used in trees random_state
         rnd_gen = np.random.Generator(np.random.PCG64(self.random_state))
 
         # check if predefined fss is less than count of features in objects
         if (isinstance(self.fss, int) and self.fss > X.shape[1]):
             raise ValueError(
-                'X have less features than expected by feature_subsample_size')
+                'X has fewer features than expected by feature_subsample_size')
 
-        # if bootstrapping is enabled check and prepare splitting point
+        # if bootstrapping is enabled, check and prepare splitting point
         bootstrap = None
         if self.bootstrap is not None:
             if (isinstance(self.bootstrap, int) and self.bootstrap > X.shape[0] or
@@ -299,6 +438,31 @@ class GradientBoostingMSE:
         return self if history is None else history
 
     def make_metrics(self, X, y):
+        """
+        Calculate evaluation metrics for the model predictions.
+
+        Parameters
+        ----------
+        X : numpy ndarray or pandas DataFrame
+            Array of size (n_objects, n_features) or DataFrame containing the input features.
+
+        y : numpy ndarray or pandas Series
+            Array of size (n_objects) or Series containing the target variable.
+
+        Returns
+        -------
+        rmse : float
+            Root Mean Squared Error (RMSE) metric.
+
+        mae : float
+            Mean Absolute Error (MAE) metric.
+
+        r2 : float
+            R-squared (coefficient of determination) metric.
+
+        mape : float
+            Mean Absolute Percentage Error (MAPE) metric.
+        """
         preds = self.predict(X)
 
         rmse = mean_squared_error(y, preds, squared=False)
@@ -310,17 +474,26 @@ class GradientBoostingMSE:
 
     def predict(self, X):
         """
-        X : numpy ndarray
-            Array of size n_objects, n_features
+        Predict the target variable for the input data.
+
+        Parameters
+        ----------
+        X : numpy ndarray or pandas DataFrame
+            Array of size (n_objects, n_features) or DataFrame containing the input features.
+
+        Raises
+        ------
+        ValueError
+            If the model is not fitted yet.
 
         Returns
         -------
         y : numpy ndarray
-            Array of size n_objects
+            Array of size (n_objects) containing the predicted target variable.
         """
-        # if model is not fitted yet raise error
+        # if the model is not fitted yet, raise an error
         if self.trees is None or self.weights is None:
-            raise ValueError('model is not fited')
+            raise ValueError('Model is not fitted')
         preds = np.array([w * tree.predict(X)
                          for w, tree in zip(self.weights, self.trees)])
         return np.sum(preds, axis=0)

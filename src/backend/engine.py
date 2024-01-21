@@ -16,8 +16,29 @@ from sklearn.metrics import mean_squared_error
 
 
 def make_syntetic_dataset(sample_size: int, feature_size: int, percent: int, randomState: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """
+    Generate a synthetic dataset for regression analysis.
+
+    Parameters
+    ----------
+    sample_size : int
+        The number of samples in the dataset.
+    feature_size : int
+        The number of features in the dataset.
+    percent : int
+        The percentage of the dataset to be used for testing.
+    randomState : int
+        The random seed for generating the dataset.
+
+    Returns
+    -------
+    Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]
+        A tuple containing the training and testing sets: X_train, X_test, y_train, y_test.
+    """
+    # Generate a synthetic regression dataset using make_regression
     X, y = make_regression(sample_size, feature_size, random_state=randomState)
 
+    # Split the dataset into training and testing sets and returns splited data
     return train_test_split(X, y, test_size=(percent / 100))
 
 
@@ -46,7 +67,7 @@ def train_random_forest(X_train, X_test, y_train, y_test, config: Configuration,
             bootstrap=config.bootstrapCoef,
         )
     except:
-        HTTPException(
+        raise HTTPException(
             status_code=500, detail='Ошибка при построении Random Forrest. Перепроверьте параметры')
 
     history_obj = {
@@ -94,7 +115,7 @@ def train_grad_boost(X_train, X_test, y_train, y_test, config: Configuration, tr
             bootstrap=config.bootstrapCoef,
         )
     except:
-        HTTPException(
+        raise HTTPException(
             status_code=500, detail='Ошибка при построении Градиентного бустинга. Перепроверьте параметры')
 
     history_obj = {
